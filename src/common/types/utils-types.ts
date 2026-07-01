@@ -3,7 +3,7 @@ import type { Request, Response } from 'express'
 export type RequestWithBody<T> = Request<{}, {}, T>
 export type RequestWithQuery<T> = Request<{}, {}, {}, T>
 export type RequestWithParams<T> = Request<T>
-export type RequestWithParamsAndBody<T, B> = Request<T, {}, B>
+export type RequestWithParamsAndBody<T, B, R = any> = Request<T, R, B>
 
 export type ApiResponse<T> = Response<T | ErrorResponse>
 
