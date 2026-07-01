@@ -1,7 +1,11 @@
-import { app } from './app.js'
+import express from 'express'
+import { setupApp } from './setup-app.js'
 
-const port = 3000
+const app = express()
+setupApp(app)
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+const PORT = process.env.PORT || 5001
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`)
 })

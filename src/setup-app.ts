@@ -1,0 +1,15 @@
+import express, { Express } from 'express'
+import { blogsRouter } from './features/blogs/index.js'
+import { PATHS } from './core/paths/paths.js'
+
+export const setupApp = (app: Express) => {
+  app.use(express.json())
+
+  app.get('/', (req, res) => {
+    res.status(200).send('Hello world')
+  })
+
+  app.use(PATHS.blogs, blogsRouter)
+
+  return app
+}
