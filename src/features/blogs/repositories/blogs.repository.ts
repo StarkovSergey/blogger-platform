@@ -5,4 +5,7 @@ export const blogsRepository = {
   findAll(): BlogViewModel[] {
     return db.blogs
   },
+  findById(id: string): BlogViewModel | null {
+    return db.blogs.find((blog) => blog.id === id) || null
+  },
 }

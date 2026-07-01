@@ -4,3 +4,4 @@ import { getBlogListHandler } from './handlers/get-blog-list.handler.js'
 export const blogsRouter = Router()
 
 blogsRouter.get('', getBlogListHandler)
+blogsRouter.get('/:id')

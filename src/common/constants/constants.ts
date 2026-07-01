@@ -1,4 +1,4 @@
-export const HTTP_STATUS = {
+export const HttpStatus = {
   OK_200: 200,
   CREATED_201: 201,
   NO_CONTENT_204: 204,
@@ -7,4 +7,4 @@ export const HTTP_STATUS = {
   NOT_FOUND_404: 404,
 } as const
 
-export type HTTP_STATUS_CODE = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS]
+export type HTTP_STATUS_CODE = (typeof HttpStatus)[keyof typeof HttpStatus]
