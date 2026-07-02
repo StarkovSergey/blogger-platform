@@ -5,13 +5,13 @@ export type RequestWithQuery<T> = Request<{}, {}, {}, T>
 export type RequestWithParams<T> = Request<T>
 export type RequestWithParamsAndBody<T, B, R = any> = Request<T, R, B>
 
-export type ApiResponse<T> = Response<T | ErrorResponse>
+export type ApiResponse<T> = Response<T | ValidationErrorDto>
 
 export type ValidationError = {
   field: string
   message: string
 }
 
-export type ErrorResponse = {
+export type ValidationErrorDto = {
   errorsMessages: ValidationError[]
 }
