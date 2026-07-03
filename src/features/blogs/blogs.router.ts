@@ -6,12 +6,13 @@ import { deleteBlogHandler } from './handlers/delete-blog.handler.js'
 import { updateBlogHandler } from './handlers/update-blog.handler.js'
 import { superAdminGuardMiddleware } from '../../core/auth/middleware/super-admin.guard-middleware.js'
 import { createBlogInputModelValidationChain } from './validation/blog.input-model.validation.js'
-import { inputValidationResultMiddleware } from '../../core/middleware/input-validation-result.middleware.js'
+import { inputValidationResultMiddleware } from '../../core/middleware/validation/input-validation-result.middleware.js'
+import { paramsIdValidationMiddleware } from '../../core/middleware/validation/params-id-validation.middleware.js'
 
 export const blogsRouter = Router()
 
 blogsRouter.get('', getBlogListHandler)
-blogsRouter.get('/:id', getBlogHandler)
+blogsRouter.get('/:id', paramsIdValidationMiddleware, getBlogHandler)
 blogsRouter.post(
   '',
   superAdminGuardMiddleware,
@@ -19,9 +20,15 @@ blogsRouter.post(
   inputValidationResultMiddleware,
   createBlogHandler
 )
-blogsRouter.delete('/:id', superAdminGuardMiddleware, deleteBlogHandler)
+blogsRouter.delete(
+  '/:id',
+  paramsIdValidationMiddleware,
+  superAdminGuardMiddleware,
+  deleteBlogHandler
+)
 blogsRouter.put(
   '/:id',
+  paramsIdValidationMiddleware,
   superAdminGuardMiddleware,
   createBlogInputModelValidationChain(),
   updateBlogHandler

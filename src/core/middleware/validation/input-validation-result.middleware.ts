@@ -4,8 +4,8 @@ import {
   type ValidationError as ExpressValidatorError,
   validationResult,
 } from 'express-validator'
-import type { ValidationError } from '../../common/types/utils-types.js'
-import { HttpStatus } from '../../common/constants/constants.js'
+import type { ValidationError } from '../../../common/types/utils-types.js'
+import { HttpStatus } from '../../../common/constants/constants.js'
 
 const formatErrors = (error: ExpressValidatorError): ValidationError => {
   const expressError = error as FieldValidationError
