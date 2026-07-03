@@ -25,4 +25,24 @@ export const blogsTestClient = {
 
     return res.body
   },
+  async getBlogById(app: Express, id: string): Promise<BlogViewModel> {
+    const res = await request(app)
+      .get(`${PATHS.blogs}/${id}`)
+      .expect(HttpStatus.OK_200)
+
+    return res.body
+  },
+  async updateBlog(
+    app: Express,
+    id: string,
+    blogDto: BlogInputModel
+  ): Promise<void> {
+    const updatedBlogResponse = await request(app)
+      .put(`${PATHS.blogs}/${id}`)
+      .set('Authorization', generateAdminAuthToken())
+      .send(blogDto)
+      .expect(HttpStatus.NO_CONTENT_204)
+
+    return updatedBlogResponse.body
+  },
 }
