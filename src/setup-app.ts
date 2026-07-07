@@ -1,8 +1,8 @@
 import express, { Express } from 'express'
-import { blogsRouter } from './features/blogs/router/blogs.router'
+import { blogsRouter } from './features/blogs/router/blogs.router.js'
 import { PATHS } from './core/paths/paths.js'
 import { testsRouter } from './features/tests/tests.router.js'
-import { postsRouter } from './features/posts/router/posts.router'
+import { postsRouter } from './features/posts/router/posts.router.js'
 
 export const setupApp = (app: Express) => {
   app.use(express.json())
