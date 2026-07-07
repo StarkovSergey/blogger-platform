@@ -1,7 +1,8 @@
 import express, { Express } from 'express'
-import { blogsRouter } from './features/blogs/index.js'
+import { blogsRouter } from './features/blogs/router/blogs.router'
 import { PATHS } from './core/paths/paths.js'
 import { testsRouter } from './features/tests/tests.router.js'
+import { postsRouter } from './features/posts/router/posts.router'
 
 export const setupApp = (app: Express) => {
   app.use(express.json())
@@ -11,6 +12,7 @@ export const setupApp = (app: Express) => {
   })
 
   app.use(PATHS.blogs, blogsRouter)
+  app.use(PATHS.posts, postsRouter)
   app.use(PATHS.testing, testsRouter)
 
   return app

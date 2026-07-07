@@ -1,11 +1,11 @@
 import type {
   RequestWithParams,
   ApiResponse,
-} from '../../../common/types/utils-types.js'
-import { blogsRepository } from '../repositories/blogs.repository.js'
-import { createErrorsMessages } from '../../../common/helpers/create-errors-messages.js'
-import { HttpStatus } from '../../../common/constants/constants.js'
-import type { BlogViewModel } from '../models/BlogViewModel.js'
+} from '../../../../common/types/utils-types.js'
+import { blogsRepository } from '../../repositories/blogs.repository.js'
+import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
+import { HttpStatus } from '../../../../common/constants/constants.js'
+import type { BlogViewModel } from '../../models/BlogViewModel.js'
 
 export function getBlogHandler(
   req: RequestWithParams<{ id: string }>,

@@ -1,10 +1,10 @@
 import {
   ApiResponse,
   RequestWithParams,
-} from '../../../common/types/utils-types.js'
-import { blogsRepository } from '../repositories/blogs.repository.js'
-import { HttpStatus } from '../../../common/constants/constants.js'
-import { createErrorsMessages } from '../../../common/helpers/create-errors-messages.js'
+} from '../../../../common/types/utils-types.js'
+import { blogsRepository } from '../../repositories/blogs.repository.js'
+import { HttpStatus } from '../../../../common/constants/constants.js'
+import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
 
 export function deleteBlogHandler(
   req: RequestWithParams<{ id: string }>,
