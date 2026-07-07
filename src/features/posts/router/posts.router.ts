@@ -16,7 +16,6 @@ postsRouter.get('', getPostListHandler)
 postsRouter.get(
   '/:id',
   paramsIdValidationMiddleware,
-  superAdminGuardMiddleware,
   inputValidationResultMiddleware,
   getPostHandler
 )
