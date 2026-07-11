@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import express from 'express'
 import { setupApp } from '../../../src/setup-app.js'
 import { clearDb } from '../../utils/clear-db.js'
@@ -8,11 +8,17 @@ import { HttpStatus } from '../../../src/common/constants/constants.js'
 import { generateAdminAuthToken } from '../../utils/generate-admin-auth-token.js'
 import { blogsTestClient } from '../../utils/test-clients/blogs-test-client.js'
 import { BlogInputModel } from '../../../src/features/blogs/models/BlogInputModel.js'
+import { runDB } from '../../../src/db/mongo.db.js'
+import { SETTINGS } from '../../../src/settings/config.js'
 
 describe('Blogs API', () => {
   const app = express()
   setupApp(app)
   const adminToken = generateAdminAuthToken()
+
+  beforeAll(async () => {
+    await runDB(SETTINGS.MONGO_URL_TEST)
+  })
 
   beforeEach(async () => {
     await clearDb(app)
@@ -67,6 +73,7 @@ describe('Blogs API', () => {
 
   it('should delete blog; DELETE /api/blogs/:id', async () => {
     const createdBlog = await blogsTestClient.createBlog(app)
+    console.log(createdBlog)
 
     await request(app)
       .delete(`${PATHS.blogs}/${createdBlog.id}`)

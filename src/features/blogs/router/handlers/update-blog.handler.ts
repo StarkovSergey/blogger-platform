@@ -7,25 +7,29 @@ import { HttpStatus } from '../../../../common/constants/constants.js'
 import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
 import { BlogInputModel } from '../../models/BlogInputModel.js'
 
-export function updateBlogHandler(
+export async function updateBlogHandler(
   req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>,
   res: ApiResponse<void>
 ) {
-  const id = req.params.id
-  const isUpdated = blogsRepository.update(id, req.body)
+  try {
+    const id = req.params.id
+    const isUpdated = await blogsRepository.update(id, req.body)
 
-  if (!isUpdated) {
-    res.status(HttpStatus.NOT_FOUND_404).json(
-      createErrorsMessages([
-        {
-          field: 'id',
-          message: 'Blog not found',
-        },
-      ])
-    )
+    if (!isUpdated) {
+      res.status(HttpStatus.NOT_FOUND_404).json(
+        createErrorsMessages([
+          {
+            field: 'id',
+            message: 'Blog not found',
+          },
+        ])
+      )
 
-    return
+      return
+    }
+
+    res.sendStatus(HttpStatus.NO_CONTENT_204)
+  } catch {
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
   }
-
-  res.sendStatus(HttpStatus.NO_CONTENT_204)
 }

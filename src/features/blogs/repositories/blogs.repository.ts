@@ -1,44 +1,45 @@
-import type { BlogViewModel } from '../models/BlogViewModel.js'
-import { db } from '../../../db/db.js'
 import type { BlogInputModel } from '../models/BlogInputModel.js'
+import { blogsCollection } from '../../../db/collections.js'
+import { ObjectId, WithId } from 'mongodb'
+
+import { Blog } from '../types/blog.js'
 
 export const blogsRepository = {
-  findAll(): BlogViewModel[] {
-    return db.blogs
+  async findAll(): Promise<WithId<Blog>[]> {
+    return blogsCollection.find().toArray()
   },
-  findById(id: string): BlogViewModel | null {
-    return db.blogs.find((blog) => blog.id === id) || null
-  },
-  create(blog: BlogInputModel): BlogViewModel {
-    const newBlog = {
-      id: String(db.blogs.length ? db.blogs.length + 1 : 1),
-      ...blog,
+  async findById(id: string): Promise<WithId<Blog> | null> {
+    if (!ObjectId.isValid(id)) {
+      return null
     }
 
-    db.blogs.push(newBlog)
-    return newBlog
+    return blogsCollection.findOne({ _id: new ObjectId(id) })
   },
-  delete(id: string): boolean {
-    const index = db.blogs.findIndex((blog) => blog.id === id)
-
-    if (index === -1) {
+  async create(blog: BlogInputModel): Promise<WithId<Blog>> {
+    const insertResult = await blogsCollection.insertOne(blog)
+    return { ...blog, _id: insertResult.insertedId }
+  },
+  async delete(id: string): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
       return false
     }
 
-    db.blogs.splice(index, 1)
-    return true
-  },
-  update(id: string, dto: BlogInputModel): boolean {
-    const blog = db.blogs.find((blog) => blog.id === id)
+    const deleteResult = await blogsCollection.deleteOne({
+      _id: new ObjectId(id),
+    })
 
-    if (!blog) {
+    return deleteResult.deletedCount > 0
+  },
+  async update(id: string, dto: BlogInputModel): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
       return false
     }
 
-    blog.name = dto.name
-    blog.description = dto.description
-    blog.websiteUrl = dto.websiteUrl
+    const updatedResult = await blogsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: dto }
+    )
 
-    return true
+    return updatedResult.matchedCount > 0
   },
 }

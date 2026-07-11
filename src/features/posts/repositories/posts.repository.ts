@@ -1,52 +1,60 @@
-import { db } from '../../../db/db.js'
-import { PostViewModel } from '../models/PostViewModel.js'
 import { PostInputModel } from '../models/PostInputModel.js'
+import { ObjectId, WithId } from 'mongodb'
+import { Post } from '../types/post.js'
+import { blogsCollection, postsCollection } from '../../../db/collections.js'
 
 export const postsRepository = {
-  findAll(): PostViewModel[] {
-    return db.posts
+  async findAll(): Promise<WithId<Post>[]> {
+    return postsCollection.find().toArray()
   },
-  findById(id: string): PostViewModel | null {
-    return db.posts.find((post) => post.id === id) || null
+  async findById(id: string): Promise<WithId<Post> | null> {
+    if (!ObjectId.isValid(id)) {
+      return null
+    }
+
+    return postsCollection.findOne({ _id: new ObjectId(id) })
   },
-  create(post: PostInputModel): PostViewModel | null {
-    const blog = db.blogs.find((blog) => blog.id === post.blogId)
+  async create(post: PostInputModel): Promise<WithId<Post> | null> {
+    const blog = await blogsCollection.findOne({
+      _id: new ObjectId(post.blogId),
+    })
 
     if (!blog) {
       return null
     }
 
-    const newPost = {
-      id: String(db.posts.length ? db.posts.length + 1 : 1),
+    const insertResult = await postsCollection.insertOne({
       ...post,
       blogName: blog.name,
+    })
+
+    return {
+      ...post,
+      blogName: blog.name,
+      _id: insertResult.insertedId,
     }
-
-    db.posts.push(newPost)
-    return newPost
   },
-  delete(id: string): boolean {
-    const index = db.posts.findIndex((post) => post.id === id)
-
-    if (index === -1) {
+  async delete(id: string): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
       return false
     }
 
-    db.posts.splice(index, 1)
-    return true
-  },
-  update(id: string, dto: PostInputModel): boolean {
-    const post = db.posts.find((post) => post.id === id)
+    const deleteResult = await postsCollection.deleteOne({
+      _id: new ObjectId(id),
+    })
 
-    if (!post) {
+    return deleteResult.deletedCount > 0
+  },
+  async update(id: string, dto: PostInputModel): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
       return false
     }
 
-    post.title = dto.title
-    post.shortDescription = dto.shortDescription
-    post.content = dto.content
-    post.blogId = dto.blogId
+    const updatedResult = await postsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: dto }
+    )
 
-    return true
+    return updatedResult.matchedCount > 0
   },
 }

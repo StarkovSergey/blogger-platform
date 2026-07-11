@@ -6,25 +6,29 @@ import { HttpStatus } from '../../../../common/constants/constants.js'
 import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
 import { postsRepository } from '../../repositories/posts.repository.js'
 
-export function deletePostHandler(
+export async function deletePostHandler(
   req: RequestWithParams<{ id: string }>,
   res: ApiResponse<void>
 ) {
-  const id = req.params.id
-  const isDeleted = postsRepository.delete(id)
+  try {
+    const id = req.params.id
+    const isDeleted = postsRepository.delete(id)
 
-  if (!isDeleted) {
-    res.status(HttpStatus.NOT_FOUND_404).json(
-      createErrorsMessages([
-        {
-          field: 'id',
-          message: 'Post not found',
-        },
-      ])
-    )
+    if (!isDeleted) {
+      res.status(HttpStatus.NOT_FOUND_404).json(
+        createErrorsMessages([
+          {
+            field: 'id',
+            message: 'Post not found',
+          },
+        ])
+      )
 
-    return
+      return
+    }
+
+    res.sendStatus(HttpStatus.NO_CONTENT_204)
+  } catch {
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
   }
-
-  res.sendStatus(HttpStatus.NO_CONTENT_204)
 }

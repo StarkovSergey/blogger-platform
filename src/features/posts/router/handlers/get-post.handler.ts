@@ -6,26 +6,33 @@ import { createErrorsMessages } from '../../../../common/helpers/create-errors-m
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { PostViewModel } from '../../models/PostViewModel.js'
 import { postsRepository } from '../../repositories/posts.repository.js'
+import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
 
-export function getPostHandler(
+export async function getPostHandler(
   req: RequestWithParams<{ id: string }>,
   res: ApiResponse<PostViewModel>
 ) {
-  const id = req.params.id
-  const post = postsRepository.findById(id)
+  try {
+    const id = req.params.id
+    const post = await postsRepository.findById(id)
 
-  if (!post) {
-    res.status(HttpStatus.NOT_FOUND_404).json(
-      createErrorsMessages([
-        {
-          field: 'id',
-          message: 'Post not found',
-        },
-      ])
-    )
+    if (!post) {
+      res.status(HttpStatus.NOT_FOUND_404).json(
+        createErrorsMessages([
+          {
+            field: 'id',
+            message: 'Post not found',
+          },
+        ])
+      )
 
-    return
+      return
+    }
+
+    const postViewModel = mapToPostViewModel(post)
+
+    res.json(postViewModel)
+  } catch {
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
   }
-
-  res.json(post)
 }

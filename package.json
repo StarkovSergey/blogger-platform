@@ -5,19 +5,20 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --inspect src/index.ts",
+    "dev": "tsx watch --inspect --env-file=.env src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node --env-file=.env dist/index.js",
     "test": "vitest",
     "test:run": "vitest run"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8",
   "dependencies": {
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
+    "mongodb": "^7.5.0",
     "prettier": "^3.8.4"
   },
   "devDependencies": {

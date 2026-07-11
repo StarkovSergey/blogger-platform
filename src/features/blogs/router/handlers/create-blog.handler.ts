@@ -4,11 +4,17 @@ import { BlogInputModel } from '../../models/BlogInputModel.js'
 import { BlogViewModel } from '../../models/BlogViewModel.js'
 import { blogsRepository } from '../../repositories/blogs.repository.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
+import { mapToBlogListViewModel } from '../mappers/map-to-blog-list-view-model.js'
 
-export function createBlogHandler(
+export async function createBlogHandler(
   req: RequestWithBody<BlogInputModel>,
   res: Response<BlogViewModel>
 ) {
-  const createdBlog = blogsRepository.create(req.body)
-  res.status(HttpStatus.CREATED_201).json(createdBlog)
+  try {
+    const createdBlog = await blogsRepository.create(req.body)
+    const blogViewModel = mapToBlogListViewModel(createdBlog)
+    res.status(HttpStatus.CREATED_201).json(blogViewModel)
+  } catch {
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
+  }
 }
