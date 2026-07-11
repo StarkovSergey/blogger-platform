@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import express from 'express'
 import { setupApp } from '../../../src/setup-app.js'
 import { clearDb } from '../../utils/clear-db.js'
@@ -7,7 +7,7 @@ import { PATHS } from '../../../src/core/paths/paths.js'
 import { HttpStatus } from '../../../src/common/constants/constants.js'
 import { generateAdminAuthToken } from '../../utils/generate-admin-auth-token.js'
 import { VALID_BLOG_INPUT } from '../../utils/test-clients/blogs-test-client.js'
-import { runDB } from '../../../src/db/mongo.db.js'
+import { runDB, stopDb } from '../../../src/db/mongo.db.js'
 import { SETTINGS } from '../../../src/settings/config.js'
 
 const invalidBlogBodies = [
@@ -85,6 +85,10 @@ describe('Blogs API body validation check', () => {
 
   beforeEach(async () => {
     await clearDb(app)
+  })
+
+  afterAll(async () => {
+    await stopDb()
   })
 
   it('should not create blog without auth token; POST /api/blogs', async () => {

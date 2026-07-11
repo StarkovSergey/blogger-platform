@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import express from 'express'
 import { setupApp } from '../../../src/setup-app.js'
 import { clearDb } from '../../utils/clear-db.js'
@@ -8,7 +8,7 @@ import { HttpStatus } from '../../../src/common/constants/constants.js'
 import { generateAdminAuthToken } from '../../utils/generate-admin-auth-token.js'
 import { blogsTestClient } from '../../utils/test-clients/blogs-test-client.js'
 import { BlogInputModel } from '../../../src/features/blogs/models/BlogInputModel.js'
-import { runDB } from '../../../src/db/mongo.db.js'
+import { runDB, stopDb } from '../../../src/db/mongo.db.js'
 import { SETTINGS } from '../../../src/settings/config.js'
 
 describe('Blogs API', () => {
@@ -22,6 +22,10 @@ describe('Blogs API', () => {
 
   beforeEach(async () => {
     await clearDb(app)
+  })
+
+  afterAll(async () => {
+    await stopDb()
   })
 
   it('should create blog; POST /api/blogs', async () => {

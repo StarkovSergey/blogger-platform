@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import express from 'express'
 import { setupApp } from '../../../src/setup-app.js'
 import { clearDb } from '../../utils/clear-db.js'
@@ -10,7 +10,7 @@ import {
 import request from 'supertest'
 import { PATHS } from '../../../src/core/paths/paths.js'
 import { HttpStatus } from '../../../src/common/constants/constants.js'
-import { runDB } from '../../../src/db/mongo.db.js'
+import { runDB, stopDb } from '../../../src/db/mongo.db.js'
 import { SETTINGS } from '../../../src/settings/config.js'
 
 describe('Posts API', () => {
@@ -28,6 +28,10 @@ describe('Posts API', () => {
 
     const blog = await blogsTestClient.createBlog(app)
     blogId = blog.id
+  })
+
+  afterAll(async () => {
+    await stopDb()
   })
 
   it('should create post; POST /api/posts', () => {

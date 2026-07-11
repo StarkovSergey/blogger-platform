@@ -8,10 +8,6 @@ export const postsRepository = {
     return postsCollection.find().toArray()
   },
   async findById(id: string): Promise<WithId<Post> | null> {
-    if (!ObjectId.isValid(id)) {
-      return null
-    }
-
     return postsCollection.findOne({ _id: new ObjectId(id) })
   },
   async create(post: PostInputModel): Promise<WithId<Post> | null> {
@@ -35,10 +31,6 @@ export const postsRepository = {
     }
   },
   async delete(id: string): Promise<boolean> {
-    if (!ObjectId.isValid(id)) {
-      return false
-    }
-
     const deleteResult = await postsCollection.deleteOne({
       _id: new ObjectId(id),
     })
@@ -46,10 +38,6 @@ export const postsRepository = {
     return deleteResult.deletedCount > 0
   },
   async update(id: string, dto: PostInputModel): Promise<boolean> {
-    if (!ObjectId.isValid(id)) {
-      return false
-    }
-
     const updatedResult = await postsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: dto }
