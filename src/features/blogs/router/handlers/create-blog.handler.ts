@@ -14,6 +14,7 @@ export async function createBlogHandler(
   try {
     const newBlog: Blog = {
       ...req.body,
+      isMembership: false,
       createdAt: new Date(),
     }
 

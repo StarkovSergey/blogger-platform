@@ -72,6 +72,7 @@ describe('Blogs API', () => {
     expect(blogResponse).toEqual({
       ...blogUpdatedData,
       id: createdBlog.id,
+      isMembership: createdBlog.isMembership,
       createdAt: createdBlog.createdAt,
     })
   })
