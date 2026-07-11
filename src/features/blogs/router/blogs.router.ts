@@ -12,7 +12,12 @@ import { paramsIdValidationMiddleware } from '../../../core/middleware/validatio
 export const blogsRouter = Router()
 
 blogsRouter.get('', getBlogListHandler)
-blogsRouter.get('/:id', paramsIdValidationMiddleware, getBlogHandler)
+blogsRouter.get(
+  '/:id',
+  paramsIdValidationMiddleware,
+  inputValidationResultMiddleware,
+  getBlogHandler
+)
 blogsRouter.post(
   '',
   superAdminGuardMiddleware,
@@ -24,6 +29,7 @@ blogsRouter.delete(
   '/:id',
   paramsIdValidationMiddleware,
   superAdminGuardMiddleware,
+  inputValidationResultMiddleware,
   deleteBlogHandler
 )
 blogsRouter.put(

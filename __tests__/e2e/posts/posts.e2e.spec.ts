@@ -75,10 +75,12 @@ describe('Posts API', () => {
     await postsTestClient.updatePost(app, createdPost.id, postUpdatedData)
 
     const postResponse = await postsTestClient.getPostById(app, createdPost.id)
+
     expect(postResponse).toEqual({
       ...postUpdatedData,
       id: createdPost.id,
       blogName: createdPost.blogName,
+      createdAt: createdPost.createdAt,
     })
   })
   it('should delete post; DELETE /api/posts/:id', async () => {

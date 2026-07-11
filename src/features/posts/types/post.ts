@@ -4,4 +4,5 @@ export type Post = {
   content: string
   blogId: string
   blogName: string
+  createdAt: Date
 }

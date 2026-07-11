@@ -8,13 +8,18 @@ import { postsRepository } from '../../repositories/posts.repository.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
 import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
+import { Post } from '../../types/post.js'
 
 export const createPostHandler = async (
   req: RequestWithBody<PostInputModel>,
   res: ApiResponse<PostViewModel>
 ) => {
   try {
-    const createdPost = await postsRepository.create(req.body)
+    const newPost: Omit<Post, 'blogName'> = {
+      ...req.body,
+      createdAt: new Date(),
+    }
+    const createdPost = await postsRepository.create(newPost)
 
     if (!createdPost) {
       res.status(HttpStatus.NOT_FOUND_404).json(

@@ -10,5 +10,6 @@ export const mapToPostViewModel = (post: WithId<Post>): PostViewModel => {
     shortDescription: post.shortDescription,
     blogId: post.blogId,
     blogName: post.blogName,
+    createdAt: post.createdAt.toISOString(),
   }
 }

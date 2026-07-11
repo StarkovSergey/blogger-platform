@@ -53,7 +53,7 @@ describe('Blogs API', () => {
 
   it('should return 404 if blog does not exist; GET /api/blogs/:id', async () => {
     await request(app)
-      .get(`${PATHS.blogs}/not-existing-id`)
+      .get(`${PATHS.blogs}/507f1f77bcf86cd799439011`)
       .expect(HttpStatus.NOT_FOUND_404)
   })
 
@@ -72,12 +72,12 @@ describe('Blogs API', () => {
     expect(blogResponse).toEqual({
       ...blogUpdatedData,
       id: createdBlog.id,
+      createdAt: createdBlog.createdAt,
     })
   })
 
   it('should delete blog; DELETE /api/blogs/:id', async () => {
     const createdBlog = await blogsTestClient.createBlog(app)
-    console.log(createdBlog)
 
     await request(app)
       .delete(`${PATHS.blogs}/${createdBlog.id}`)

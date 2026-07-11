@@ -10,7 +10,7 @@ export const postsRepository = {
   async findById(id: string): Promise<WithId<Post> | null> {
     return postsCollection.findOne({ _id: new ObjectId(id) })
   },
-  async create(post: PostInputModel): Promise<WithId<Post> | null> {
+  async create(post: Omit<Post, 'blogName'>): Promise<WithId<Post> | null> {
     const blog = await blogsCollection.findOne({
       _id: new ObjectId(post.blogId),
     })
