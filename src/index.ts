@@ -3,16 +3,16 @@ import { setupApp } from './setup-app.js'
 import { SETTINGS } from './settings/config.js'
 import { runDB } from './db/mongo.db.js'
 
-const bootstrap = async () => {
-  const app = express()
-  setupApp(app)
-  const PORT = SETTINGS.PORT
+const app = express()
+setupApp(app)
 
-  await runDB(SETTINGS.MONGO_URL)
+await runDB(SETTINGS.MONGO_URL)
 
-  app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`)
+// на Vercel не запускаем сервер, там используется serverless функция
+if (!process.env.VERCEL) {
+  app.listen(SETTINGS.PORT, () => {
+    console.log(`Example app listening on port ${SETTINGS.PORT}`)
   })
 }
 
-bootstrap()
+export default app
