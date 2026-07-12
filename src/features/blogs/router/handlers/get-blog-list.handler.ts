@@ -8,9 +8,10 @@ export const getBlogListHandler = async (
   req: Request,
   res: Response<BlogViewModel[]>
 ) => {
+  console.log('getBlogListHandler')
   try {
     const blogs = await blogsRepository.findAll()
-
+    console.log('blogs', blogs)
     const blogsViewModels = blogs.map(mapToBlogListViewModel)
     res.json(blogsViewModels)
   } catch {

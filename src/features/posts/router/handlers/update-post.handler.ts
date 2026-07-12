@@ -14,7 +14,7 @@ export async function updatePostHandler(
 ) {
   try {
     const blogId = req.body.blogId
-    const blog = blogsRepository.findById(blogId)
+    const blog = await blogsRepository.findById(blogId)
     if (!blog) {
       res.status(HttpStatus.NOT_FOUND_404).json(
         createErrorsMessages([
@@ -27,7 +27,7 @@ export async function updatePostHandler(
     }
 
     const id = req.params.id
-    const isUpdated = postsRepository.update(id, req.body)
+    const isUpdated = await postsRepository.update(id, req.body)
 
     if (!isUpdated) {
       res.status(HttpStatus.NOT_FOUND_404).json(

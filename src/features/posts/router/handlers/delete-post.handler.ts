@@ -12,7 +12,7 @@ export async function deletePostHandler(
 ) {
   try {
     const id = req.params.id
-    const isDeleted = postsRepository.delete(id)
+    const isDeleted = await postsRepository.delete(id)
 
     if (!isDeleted) {
       res.status(HttpStatus.NOT_FOUND_404).json(
