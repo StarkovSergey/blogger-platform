@@ -1,20 +1,19 @@
 import { Request, Response } from 'express'
-import { blogsRepository } from '../../repositories/blogs.repository.js'
 import { BlogViewModel } from '../../models/BlogViewModel.js'
 import { mapToBlogListViewModel } from '../mappers/map-to-blog-list-view-model.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
+import { blogsService } from '../../application/blogs.service.js'
+import { errorsHandlers } from '../../../../core/exeptions/errors-handlers'
 
 export const getBlogListHandler = async (
   req: Request,
   res: Response<BlogViewModel[]>
 ) => {
-  console.log('getBlogListHandler')
   try {
-    const blogs = await blogsRepository.findAll()
-    console.log('blogs', blogs)
+    const blogs = await blogsService.findMany()
     const blogsViewModels = blogs.map(mapToBlogListViewModel)
     res.json(blogsViewModels)
-  } catch {
-    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
+  } catch (e) {
+    errorsHandlers(e, res)
   }
 }
