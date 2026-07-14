@@ -7,11 +7,12 @@ export type RequestWithParamsAndBody<T, B, R = any> = Request<T, R, B>
 
 export type ApiResponse<T> = Response<T | ValidationErrorDto>
 
-export type ValidationError = {
-  field: string
+export type AppError = {
   message: string
+  field?: string // валидация
+  code?: string // domain
 }
 
 export type ValidationErrorDto = {
-  errorsMessages: ValidationError[]
+  errorsMessages: AppError[]
 }

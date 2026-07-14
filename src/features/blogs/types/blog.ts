@@ -5,3 +5,7 @@ export type Blog = {
   isMembership: boolean
   createdAt: Date
 }
+
+export enum BlogErrorCode {
+  HasPosts = 'BLOG_HAS_POSTS',
+}

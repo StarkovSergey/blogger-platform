@@ -1,9 +1,9 @@
-import type { ValidationError } from '../types/utils-types.js'
+import type { AppError } from '../types/utils-types.js'
 
 export const createErrorsMessages = (
-  errors: ValidationError[]
+  errors: AppError[]
 ): {
-  errorsMessages: ValidationError[]
+  errorsMessages: AppError[]
 } => {
   return {
     errorsMessages: errors,

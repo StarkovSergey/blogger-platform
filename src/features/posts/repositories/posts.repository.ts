@@ -15,7 +15,7 @@ export const postsRepository = {
     const res = await postsCollection.findOne({ _id: new ObjectId(id) })
 
     if (!res) {
-      throw new NotFoundException('Post not found', 'id')
+      throw new NotFoundException('Post not found')
     }
 
     return res

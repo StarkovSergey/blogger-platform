@@ -2,10 +2,7 @@
  * Ресурс не найден.
  * */
 export class NotFoundException extends Error {
-  constructor(
-    message: string,
-    public readonly field: string = 'id'
-  ) {
+  constructor(message: string) {
     super(message)
     this.name = 'NotFoundException'
   }
