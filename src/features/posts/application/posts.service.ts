@@ -22,4 +22,11 @@ export const postsService = {
 
     return postsRepository.create(post)
   },
+  async deletePost(id: string) {
+    await postsRepository.delete(id)
+  },
+  async update(id: string, dto: PostInputModel): Promise<void> {
+    await blogsRepository.findByIdOrFail(dto.blogId) // если блога нет -> ошибка
+    await postsRepository.update(id, dto)
+  },
 }

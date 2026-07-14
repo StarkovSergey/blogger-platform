@@ -37,19 +37,27 @@ export const postsRepository = {
       _id: insertResult.insertedId,
     }
   },
-  async delete(id: string): Promise<boolean> {
+  async delete(id: string): Promise<void> {
     const deleteResult = await postsCollection.deleteOne({
       _id: new ObjectId(id),
     })
 
-    return deleteResult.deletedCount > 0
+    if (deleteResult.deletedCount < 1) {
+      throw new NotFoundException('Post not found')
+    }
+
+    return
   },
-  async update(id: string, dto: PostInputModel): Promise<boolean> {
+  async update(id: string, dto: PostInputModel): Promise<void> {
     const updatedResult = await postsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: dto }
     )
 
-    return updatedResult.matchedCount > 0
+    if (updatedResult.matchedCount < 1) {
+      throw new NotFoundException('Post not found')
+    }
+
+    return
   },
 }
