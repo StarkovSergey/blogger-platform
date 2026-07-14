@@ -24,6 +24,7 @@ export const blogsService = {
     return
   },
   async delete(id: string) {
+    // TODO: при удалении блога с постами - скорее всего написать, что нельзя удалять блог - DomainError
     await blogsRepository.delete(id)
     return
   },

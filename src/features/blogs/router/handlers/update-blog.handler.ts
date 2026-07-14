@@ -2,12 +2,10 @@ import type {
   ApiResponse,
   RequestWithParamsAndBody,
 } from '../../../../common/types/utils-types.js'
-import { blogsRepository } from '../../repositories/blogs.repository.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
-import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
 import { BlogInputModel } from '../../models/BlogInputModel.js'
 import { blogsService } from '../../application/blogs.service.js'
-import { errorsHandlers } from '../../../../core/exeptions/errors-handlers'
+import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 
 // TODO: при обновлении имени блока - обновить имя блога в постах этого блога
 

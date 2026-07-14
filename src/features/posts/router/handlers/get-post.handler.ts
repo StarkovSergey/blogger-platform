@@ -1,12 +1,11 @@
 import type {
-  RequestWithParams,
   ApiResponse,
+  RequestWithParams,
 } from '../../../../common/types/utils-types.js'
-import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
-import { HttpStatus } from '../../../../common/constants/constants.js'
 import { PostViewModel } from '../../models/PostViewModel.js'
 import { postsRepository } from '../../repositories/posts.repository.js'
 import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
+import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 
 export async function getPostHandler(
   req: RequestWithParams<{ id: string }>,
@@ -14,25 +13,12 @@ export async function getPostHandler(
 ) {
   try {
     const id = req.params.id
-    const post = await postsRepository.findById(id)
-
-    if (!post) {
-      res.status(HttpStatus.NOT_FOUND_404).json(
-        createErrorsMessages([
-          {
-            field: 'id',
-            message: 'Post not found',
-          },
-        ])
-      )
-
-      return
-    }
+    const post = await postsRepository.findByIdOrFailed(id)
 
     const postViewModel = mapToPostViewModel(post)
 
     res.json(postViewModel)
-  } catch {
-    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
+  } catch (e) {
+    errorsHandlers(e, res)
   }
 }

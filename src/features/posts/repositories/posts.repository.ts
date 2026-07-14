@@ -2,13 +2,23 @@ import { PostInputModel } from '../models/PostInputModel.js'
 import { ObjectId, WithId } from 'mongodb'
 import { Post } from '../types/post.js'
 import { blogsCollection, postsCollection } from '../../../db/collections.js'
+import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
 
 export const postsRepository = {
-  async findAll(): Promise<WithId<Post>[]> {
+  async findMany(): Promise<WithId<Post>[]> {
     return postsCollection.find().toArray()
   },
   async findById(id: string): Promise<WithId<Post> | null> {
     return postsCollection.findOne({ _id: new ObjectId(id) })
+  },
+  async findByIdOrFailed(id: string): Promise<WithId<Post>> {
+    const res = await postsCollection.findOne({ _id: new ObjectId(id) })
+
+    if (!res) {
+      throw new NotFoundException('Post not found', 'id')
+    }
+
+    return res
   },
   async create(post: Omit<Post, 'blogName'>): Promise<WithId<Post> | null> {
     const blog = await blogsCollection.findOne({

@@ -1,20 +1,20 @@
 import { Request, Response } from 'express'
 import { PostViewModel } from '../../models/PostViewModel.js'
-import { postsRepository } from '../../repositories/posts.repository.js'
 import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
-import { HttpStatus } from '../../../../common/constants/constants.js'
+import { postsService } from '../../application/posts.service.js'
+import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 
 export const getPostListHandler = async (
   req: Request,
   res: Response<PostViewModel[]>
 ) => {
   try {
-    const posts = await postsRepository.findAll()
+    const posts = await postsService.findMany()
 
     const postViewModels = posts.map(mapToPostViewModel)
 
     res.json(postViewModels)
-  } catch {
-    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
+  } catch (e) {
+    errorsHandlers(e, res)
   }
 }

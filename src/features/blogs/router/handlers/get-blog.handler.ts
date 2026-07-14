@@ -5,7 +5,7 @@ import type {
 import type { BlogViewModel } from '../../models/BlogViewModel.js'
 import { mapToBlogListViewModel } from '../mappers/map-to-blog-list-view-model.js'
 import { blogsService } from '../../application/blogs.service.js'
-import { errorsHandlers } from '../../../../core/exeptions/errors-handlers'
+import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 
 export async function getBlogHandler(
   req: RequestWithParams<{ id: string }>,

@@ -16,7 +16,7 @@ export const blogsRepository = {
     const res = await blogsCollection.findOne({ _id: new ObjectId(id) })
 
     if (!res) {
-      throw new NotFoundException('Blog not exist')
+      throw new NotFoundException('Blog not found', 'id')
     }
 
     return res
@@ -31,7 +31,7 @@ export const blogsRepository = {
     })
 
     if (deleteResult.deletedCount < 1) {
-      throw new NotFoundException('Blog not exist')
+      throw new NotFoundException('Blog not found', 'id')
     }
 
     return
@@ -43,7 +43,7 @@ export const blogsRepository = {
     )
 
     if (updatedResult.matchedCount < 1) {
-      throw new NotFoundException('Blog not exist')
+      throw new NotFoundException('Blog not found', 'id')
     }
 
     return
