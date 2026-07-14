@@ -1,7 +1,7 @@
 import { PostInputModel } from '../models/PostInputModel.js'
 import { ObjectId, WithId } from 'mongodb'
 import { Post } from '../types/post.js'
-import { blogsCollection, postsCollection } from '../../../db/collections.js'
+import { postsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
 
 export const postsRepository = {
@@ -20,23 +20,20 @@ export const postsRepository = {
 
     return res
   },
-  async create(post: Omit<Post, 'blogName'>): Promise<WithId<Post> | null> {
-    const blog = await blogsCollection.findOne({
-      _id: new ObjectId(post.blogId),
-    })
-
-    if (!blog) {
-      return null
-    }
-
+  async findPostsByBlog(blogId: string): Promise<WithId<Post>[]> {
+    return postsCollection
+      .find({
+        blogId,
+      })
+      .toArray()
+  },
+  async create(post: Post): Promise<WithId<Post>> {
     const insertResult = await postsCollection.insertOne({
       ...post,
-      blogName: blog.name,
     })
 
     return {
       ...post,
-      blogName: blog.name,
       _id: insertResult.insertedId,
     }
   },

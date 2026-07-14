@@ -8,35 +8,58 @@ import { superAdminGuardMiddleware } from '../../../core/auth/middleware/super-a
 import { createBlogInputModelValidationChain } from '../validation/blog.input-model.validation.js'
 import { inputValidationResultMiddleware } from '../../../core/middleware/validation/input-validation-result.middleware.js'
 import { paramsIdValidationMiddleware } from '../../../core/middleware/validation/params-id-validation.middleware.js'
+import { getBlogPostsHandler } from './handlers/get-blog-posts.handler.js'
+import { createBlogPostInputModelValidationChain } from '../validation/blog-post.input-model.validation.js'
+import { createBlogPostHandler } from './handlers/create-blog-post.handler.js'
 
 export const blogsRouter = Router()
 
-blogsRouter.get('', getBlogListHandler)
+export const BLOGS_PATHS = {
+  ROOT: '',
+  BY_ID: '/:id',
+  BLOG_POSTS: '/:id/posts',
+} as const
+
+blogsRouter.get(BLOGS_PATHS.ROOT, getBlogListHandler)
 blogsRouter.get(
-  '/:id',
+  BLOGS_PATHS.BY_ID,
   paramsIdValidationMiddleware,
   inputValidationResultMiddleware,
   getBlogHandler
 )
 blogsRouter.post(
-  '',
+  BLOGS_PATHS.ROOT,
   superAdminGuardMiddleware,
   createBlogInputModelValidationChain(),
   inputValidationResultMiddleware,
   createBlogHandler
 )
 blogsRouter.delete(
-  '/:id',
+  BLOGS_PATHS.BY_ID,
   paramsIdValidationMiddleware,
   superAdminGuardMiddleware,
   inputValidationResultMiddleware,
   deleteBlogHandler
 )
 blogsRouter.put(
-  '/:id',
+  BLOGS_PATHS.BY_ID,
   paramsIdValidationMiddleware,
   superAdminGuardMiddleware,
   createBlogInputModelValidationChain(),
   inputValidationResultMiddleware,
   updateBlogHandler
+)
+blogsRouter.get(
+  BLOGS_PATHS.BLOG_POSTS,
+  paramsIdValidationMiddleware,
+  inputValidationResultMiddleware,
+  getBlogPostsHandler
+)
+blogsRouter.post(
+  BLOGS_PATHS.BLOG_POSTS,
+  paramsIdValidationMiddleware,
+  superAdminGuardMiddleware,
+  createBlogPostInputModelValidationChain(),
+  inputValidationResultMiddleware,
+  createBlogPostHandler
 )

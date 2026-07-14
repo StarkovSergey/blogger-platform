@@ -3,6 +3,9 @@ import { Blog, BlogErrorCode } from '../types/blog.js'
 import { blogsRepository } from '../repositories/blogs.repository.js'
 import { BlogInputModel } from '../models/BlogInputModel.js'
 import { DomainException } from '../../../core/exeptions/domain.exception.js'
+import { Post } from '../../posts/types/post.js'
+import { postsRepository } from '../../posts/repositories/posts.repository.js'
+import { BlogPostInputModel } from '../models/BlogPostInputModel.js'
 
 export const blogsService = {
   async findMany(): Promise<WithId<Blog>[]> {
@@ -10,6 +13,11 @@ export const blogsService = {
   },
   async findByIdOrFail(id: string): Promise<WithId<Blog>> {
     return blogsRepository.findByIdOrFail(id)
+  },
+  async findPostsByBlog(blogId: string): Promise<WithId<Post>[]> {
+    await blogsRepository.findByIdOrFail(blogId) // если блога нет -> ошибка
+
+    return postsRepository.findPostsByBlog(blogId)
   },
   async create(blog: BlogInputModel): Promise<WithId<Blog>> {
     const newBlog: Blog = {
@@ -20,13 +28,24 @@ export const blogsService = {
 
     return blogsRepository.create(newBlog)
   },
+  async createBlogPost(blogId: string, dto: BlogPostInputModel) {
+    const blog = await blogsRepository.findByIdOrFail(blogId)
+
+    const newPost: Post = {
+      ...dto,
+      blogId,
+      createdAt: new Date(),
+      blogName: blog.name,
+    }
+    return await postsRepository.create(newPost)
+  },
   async update(id: string, dto: BlogInputModel): Promise<void> {
     await blogsRepository.update(id, dto)
     return
   },
   async delete(id: string) {
-    // TODO: при удалении блога с постами - скорее всего написать, что нельзя удалять блог - DomainError
-    const isBlogHasPosts = false // тут будет запрос за постами блога и проверка
+    const posts = await postsRepository.findPostsByBlog(id)
+    const isBlogHasPosts = posts.length > 0
 
     if (isBlogHasPosts) {
       throw new DomainException(

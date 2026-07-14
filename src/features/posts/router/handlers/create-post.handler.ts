@@ -1,42 +1,25 @@
 import type {
-  RequestWithBody,
   ApiResponse,
+  RequestWithBody,
 } from '../../../../common/types/utils-types.js'
 import { PostInputModel } from '../../models/PostInputModel.js'
 import { PostViewModel } from '../../models/PostViewModel.js'
-import { postsRepository } from '../../repositories/posts.repository.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
-import { createErrorsMessages } from '../../../../common/helpers/create-errors-messages.js'
 import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
-import { Post } from '../../types/post.js'
+import { postsService } from '../../application/posts.service.js'
+import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 
 export const createPostHandler = async (
   req: RequestWithBody<PostInputModel>,
   res: ApiResponse<PostViewModel>
 ) => {
   try {
-    const newPost: Omit<Post, 'blogName'> = {
-      ...req.body,
-      createdAt: new Date(),
-    }
-    const createdPost = await postsRepository.create(newPost)
-
-    if (!createdPost) {
-      res.status(HttpStatus.NOT_FOUND_404).json(
-        createErrorsMessages([
-          {
-            field: 'blogId',
-            message: 'Blog not found',
-          },
-        ])
-      )
-      return
-    }
+    const createdPost = await postsService.createPost(req.body)
 
     const postViewModel = mapToPostViewModel(createdPost)
 
     res.status(HttpStatus.CREATED_201).json(postViewModel)
-  } catch {
-    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
+  } catch (e) {
+    errorsHandlers(e, res)
   }
 }
