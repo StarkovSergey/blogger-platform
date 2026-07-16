@@ -3,10 +3,28 @@ import { ObjectId, WithId } from 'mongodb'
 import { Post } from '../types/post.js'
 import { postsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
+import { PostQueryInput } from '../types/input/post-query-input.js'
 
 export const postsRepository = {
-  async findMany(): Promise<WithId<Post>[]> {
-    return postsCollection.find().toArray()
+  async findMany(queryDto: PostQueryInput): Promise<{
+    items: WithId<Post>[]
+    totalCount: number
+  }> {
+    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto
+
+    const skip = (pageNumber - 1) * pageSize
+
+    const [items, totalCount] = await Promise.all([
+      postsCollection
+        .find()
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(pageSize)
+        .toArray(),
+      postsCollection.countDocuments(),
+    ])
+
+    return { items, totalCount }
   },
   async findById(id: string): Promise<WithId<Post> | null> {
     return postsCollection.findOne({ _id: new ObjectId(id) })

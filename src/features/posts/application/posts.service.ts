@@ -3,10 +3,14 @@ import { WithId } from 'mongodb'
 import { Post } from '../types/post.js'
 import { PostInputModel } from '../models/PostInputModel.js'
 import { blogsRepository } from '../../blogs/repositories/blogs.repository.js'
+import { PostQueryInput } from '../types/input/post-query-input.js'
 
 export const postsService = {
-  async findMany(): Promise<WithId<Post>[]> {
-    return postsRepository.findMany()
+  async findMany(queryDto: PostQueryInput): Promise<{
+    items: WithId<Post>[]
+    totalCount: number
+  }> {
+    return postsRepository.findMany(queryDto)
   },
   async findByIdOrFailed(id: string): Promise<WithId<Post>> {
     return postsRepository.findByIdOrFailed(id)
