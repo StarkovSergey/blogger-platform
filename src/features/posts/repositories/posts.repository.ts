@@ -38,12 +38,32 @@ export const postsRepository = {
 
     return res
   },
-  async findPostsByBlog(blogId: string): Promise<WithId<Post>[]> {
-    return postsCollection
-      .find({
-        blogId,
-      })
-      .toArray()
+  async findPostsByBlog(
+    blogId: string,
+    queryDto: PostQueryInput
+  ): Promise<{
+    items: WithId<Post>[]
+    totalCount: number
+  }> {
+    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto
+    const skip = (pageNumber - 1) * pageSize
+
+    const [items, totalCount] = await Promise.all([
+      postsCollection
+        .find({
+          blogId,
+        })
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(pageSize)
+        .toArray(),
+      postsCollection.countDocuments({ blogId }),
+    ])
+
+    return {
+      items,
+      totalCount,
+    }
   },
   async create(post: Post): Promise<WithId<Post>> {
     const insertResult = await postsCollection.insertOne({
@@ -77,5 +97,8 @@ export const postsRepository = {
     }
 
     return
+  },
+  async countByBlogId(blogId: string): Promise<number> {
+    return postsCollection.countDocuments({ blogId })
   },
 }

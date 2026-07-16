@@ -40,7 +40,7 @@ describe('Blog Posts API', () => {
 
       const posts = await blogsTestClient.getBlogPosts(app, blog.id)
 
-      expect(posts).toEqual([])
+      expect(posts.items).toEqual([])
     })
 
     it('should return posts for specific blog', async () => {
@@ -63,8 +63,8 @@ describe('Blog Posts API', () => {
 
       const posts = await blogsTestClient.getBlogPosts(app, blog.id)
 
-      expect(posts).toHaveLength(2)
-      expect(posts).toEqual(expect.arrayContaining([post1, post2]))
+      expect(posts.items).toHaveLength(2)
+      expect(posts.items).toEqual(expect.arrayContaining([post1, post2]))
     })
 
     it('should return only posts of requested blog', async () => {
@@ -83,8 +83,8 @@ describe('Blog Posts API', () => {
 
       const posts = await blogsTestClient.getBlogPosts(app, blog1.id)
 
-      expect(posts).toHaveLength(1)
-      expect(posts[0]).toEqual(postInBlog1)
+      expect(posts.items).toHaveLength(1)
+      expect(posts.items[0]).toEqual(postInBlog1)
     })
 
     it('should return 404 if blog does not exist', async () => {

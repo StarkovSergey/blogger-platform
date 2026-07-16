@@ -15,6 +15,7 @@ import { paginationAndSortingValidation } from '../../../core/middleware/validat
 import { BlogSortField } from '../types/input/blog-sort-field.js'
 import { sanitizeQueryMiddleware } from '../../../core/middleware/validation/sanitize-query.middleware.js'
 import { createBlogFilterQueryValidation } from '../validation/blog-filter-query.validation.js'
+import { PostSortField } from '../../posts/types/input/post-sort-field.js'
 
 export const blogsRouter = Router()
 
@@ -63,8 +64,10 @@ blogsRouter.put(
 blogsRouter.get(
   BLOGS_PATHS.BLOG_POSTS,
   paramsIdValidationMiddleware,
+  paginationAndSortingValidation(PostSortField),
   inputValidationResultMiddleware,
-  getBlogPostsHandler
+  sanitizeQueryMiddleware,
+  getBlogPostsHandler as unknown as RequestHandler
 )
 blogsRouter.post(
   BLOGS_PATHS.BLOG_POSTS,

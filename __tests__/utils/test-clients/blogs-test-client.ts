@@ -9,6 +9,7 @@ import { BlogPostInputModel } from '../../../src/features/blogs/models/BlogPostI
 import { VALID_POST_INPUT } from './posts-test-client.js'
 import { PostViewModel } from '../../../src/features/posts/models/PostViewModel.js'
 import { BLOGS_PATHS } from '../../../src/features/blogs/router/blogs.router.js'
+import { PaginatedOutput } from '../../../src/core/types/paginated-output.js'
 
 export const VALID_BLOG_INPUT: BlogInputModel = {
   name: 'Inis blog',
@@ -58,7 +59,14 @@ export const blogsTestClient = {
 
     return updatedBlogResponse.body
   },
-  async getBlogPosts(app: Express, blogId: string): Promise<PostViewModel[]> {
+  async getBlogPosts(
+    app: Express,
+    blogId: string
+  ): Promise<
+    {
+      items: BlogViewModel[]
+    } & PaginatedOutput
+  > {
     const res = await request(app)
       .get(`${PATHS.blogs}/${blogId}/posts`)
       .expect(HttpStatus.OK_200)
