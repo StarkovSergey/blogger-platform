@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { RequestWithBody } from '../../../../common/types/utils-types.js'
+import { RequestWithBody } from '../../../../core/types/utils-types.js'
 import { BlogInputModel } from '../../models/BlogInputModel.js'
 import { BlogViewModel } from '../../models/BlogViewModel.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'

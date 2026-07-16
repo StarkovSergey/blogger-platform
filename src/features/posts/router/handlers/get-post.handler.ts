@@ -1,7 +1,7 @@
 import type {
   ApiResponse,
   RequestWithParams,
-} from '../../../../common/types/utils-types.js'
+} from '../../../../core/types/utils-types.js'
 import { PostViewModel } from '../../models/PostViewModel.js'
 import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'

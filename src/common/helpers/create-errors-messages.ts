@@ -1,4 +1,4 @@
-import type { AppError } from '../types/utils-types.js'
+import type { AppError } from '../../core/types/utils-types.js'
 
 export const createErrorsMessages = (
   errors: AppError[]

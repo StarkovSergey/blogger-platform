@@ -6,10 +6,14 @@ import { DomainException } from '../../../core/exeptions/domain.exception.js'
 import { Post } from '../../posts/types/post.js'
 import { postsRepository } from '../../posts/repositories/posts.repository.js'
 import { BlogPostInputModel } from '../models/BlogPostInputModel.js'
+import { BlogQueryInput } from '../types/input/blog-query-input.js'
 
 export const blogsService = {
-  async findMany(): Promise<WithId<Blog>[]> {
-    return blogsRepository.findMany()
+  async findMany(queryDto: BlogQueryInput): Promise<{
+    items: WithId<Blog>[]
+    totalCount: number
+  }> {
+    return blogsRepository.findMany(queryDto)
   },
   async findByIdOrFail(id: string): Promise<WithId<Blog>> {
     return blogsRepository.findByIdOrFail(id)

@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { type RequestWithParamsAndBody } from '../../../../common/types/utils-types.js'
+import { type RequestWithParamsAndBody } from '../../../../core/types/utils-types.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { blogsService } from '../../application/blogs.service.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'

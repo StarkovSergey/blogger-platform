@@ -1,7 +1,7 @@
 import type {
   ApiResponse,
   RequestWithBody,
-} from '../../../../common/types/utils-types.js'
+} from '../../../../core/types/utils-types.js'
 import { PostInputModel } from '../../models/PostInputModel.js'
 import { PostViewModel } from '../../models/PostViewModel.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'

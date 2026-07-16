@@ -4,10 +4,35 @@ import { ObjectId, WithId } from 'mongodb'
 
 import { Blog } from '../types/blog.js'
 import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
+import { BlogQueryInput } from '../types/input/blog-query-input.js'
+import { escapeRegExp } from '../../../common/helpers/escape-reg-exp.js'
 
 export const blogsRepository = {
-  async findMany(): Promise<WithId<Blog>[]> {
-    return blogsCollection.find().toArray()
+  async findMany(queryDto: BlogQueryInput): Promise<{
+    items: WithId<Blog>[]
+    totalCount: number
+  }> {
+    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
+      queryDto
+
+    const skip = (pageNumber - 1) * pageSize
+    const filter: any = {}
+
+    if (searchNameTerm) {
+      filter.name = { $regex: escapeRegExp(searchNameTerm), $options: 'i' }
+    }
+
+    const [items, totalCount] = await Promise.all([
+      blogsCollection
+        .find(filter)
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(pageSize)
+        .toArray(),
+      blogsCollection.countDocuments(filter),
+    ])
+
+    return { items, totalCount }
   },
   async findById(id: string): Promise<WithId<Blog> | null> {
     return blogsCollection.findOne({ _id: new ObjectId(id) })

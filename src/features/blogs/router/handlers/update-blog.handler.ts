@@ -1,7 +1,7 @@
 import type {
   ApiResponse,
   RequestWithParamsAndBody,
-} from '../../../../common/types/utils-types.js'
+} from '../../../../core/types/utils-types.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { BlogInputModel } from '../../models/BlogInputModel.js'
 import { blogsService } from '../../application/blogs.service.js'

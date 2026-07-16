@@ -1,7 +1,7 @@
 import {
   ApiResponse,
   RequestWithParams,
-} from '../../../../common/types/utils-types.js'
+} from '../../../../core/types/utils-types.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { blogsService } from '../../application/blogs.service.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'

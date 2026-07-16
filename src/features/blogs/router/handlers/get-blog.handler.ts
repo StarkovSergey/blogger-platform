@@ -1,7 +1,7 @@
 import type {
   ApiResponse,
   RequestWithParams,
-} from '../../../../common/types/utils-types.js'
+} from '../../../../core/types/utils-types.js'
 import type { BlogViewModel } from '../../models/BlogViewModel.js'
 import { mapToBlogListViewModel } from '../mappers/map-to-blog-list-view-model.js'
 import { blogsService } from '../../application/blogs.service.js'
