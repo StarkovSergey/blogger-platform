@@ -7,6 +7,7 @@ import { RequestWithQuery } from '../../../../core/types/utils-types.js'
 import { PostQueryInput } from '../../types/input/post-query-input.js'
 import { PaginatedOutput } from '../../../../core/types/paginated-output.js'
 import { mapToPaginatedOutput } from '../../../../core/mappers/map-to-paginated-output.js'
+import { postsQueryRepository } from '../../repositories/posts.query.repository.js'
 
 export const getPostListHandler = async (
   req: RequestWithQuery<PostQueryInput>,
@@ -18,19 +19,9 @@ export const getPostListHandler = async (
 ) => {
   try {
     const queryInput = req.query
-    const { totalCount, items } = await postsService.findMany(queryInput)
+    const paginatedOutput = await postsQueryRepository.findMany(queryInput)
 
-    const postsListOutput = mapToPaginatedOutput(
-      items,
-      {
-        pageNumber: queryInput.pageNumber,
-        pageSize: queryInput.pageSize,
-        totalCount,
-      },
-      mapToPostViewModel
-    )
-
-    res.json(postsListOutput)
+    res.json(paginatedOutput)
   } catch (e) {
     errorsHandlers(e, res)
   }

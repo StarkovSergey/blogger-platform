@@ -3,9 +3,8 @@ import type {
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
 import { PostViewModel } from '../../models/PostViewModel.js'
-import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
-import { postsService } from '../../application/posts.service.js'
+import { postsQueryRepository } from '../../repositories/posts.query.repository.js'
 
 export async function getPostHandler(
   req: RequestWithParams<{ id: string }>,
@@ -13,11 +12,9 @@ export async function getPostHandler(
 ) {
   try {
     const id = req.params.id
-    const post = await postsService.findByIdOrFailed(id)
+    const post = await postsQueryRepository.findByIdOrFailed(id)
 
-    const postViewModel = mapToPostViewModel(post)
-
-    res.json(postViewModel)
+    res.json(post)
   } catch (e) {
     errorsHandlers(e, res)
   }

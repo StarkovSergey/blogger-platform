@@ -7,6 +7,29 @@ import { PostQueryInput } from '../types/input/post-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 
 export const postsQueryRepository = {
+  async findMany(queryDto: PostQueryInput): Promise<Pagination<PostViewModel>> {
+    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto
+
+    const skip = (pageNumber - 1) * pageSize
+
+    const [items, totalCount] = await Promise.all([
+      postsCollection
+        .find()
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(pageSize)
+        .toArray(),
+      postsCollection.countDocuments(),
+    ])
+
+    return {
+      items: items.map(this._mapToPostViewModel),
+      totalCount,
+      pageSize,
+      page: pageNumber,
+      pagesCount: Math.ceil(totalCount / pageSize),
+    }
+  },
   async findByIdOrFailed(id: string): Promise<PostViewModel> {
     const res = await postsCollection.findOne({ _id: new ObjectId(id) })
 
