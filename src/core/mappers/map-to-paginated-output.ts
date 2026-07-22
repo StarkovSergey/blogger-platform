@@ -1,16 +1,16 @@
 import { PaginatedOutput } from '../types/paginated-output.js'
 
-export function mapToPaginatedOutput<TItem, TData>(
+export function mapToPaginatedOutput<TItem, TData = TItem>(
   items: TItem[],
   meta: {
     pageNumber: number
     pageSize: number
     totalCount: number
   },
-  mapItem: (item: TItem) => TData
+  mapItem?: (item: TItem) => TData
 ): { items: TData[] } & PaginatedOutput {
   return {
-    items: items.map(mapItem),
+    items: mapItem ? items.map(mapItem) : (items as unknown as TData[]),
 
     page: meta.pageNumber,
     pageSize: meta.pageSize,

@@ -13,7 +13,7 @@ export const postsService = {
     return postsRepository.findMany(queryDto)
   },
   async findByIdOrFailed(id: string): Promise<WithId<Post>> {
-    return postsRepository.findByIdOrFailed(id)
+    return postsRepository.findByIdOrFail(id)
   },
   async createPost(dto: PostInputModel) {
     const blog = await blogsRepository.findByIdOrFail(dto.blogId)

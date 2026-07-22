@@ -4,3 +4,7 @@ export type PaginatedOutput = {
   pagesCount: number
   totalCount: number
 }
+
+export type Pagination<T> = {
+  items: T[]
+} & PaginatedOutput

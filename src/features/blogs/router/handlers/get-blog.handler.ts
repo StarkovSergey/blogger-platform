@@ -3,9 +3,8 @@ import type {
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
 import type { BlogViewModel } from '../../models/BlogViewModel.js'
-import { mapToBlogListViewModel } from '../mappers/map-to-blog-list-view-model.js'
-import { blogsService } from '../../application/blogs.service.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
+import { blogsQueryRepository } from '../../repositories/blogs.query.repository.js'
 
 export async function getBlogHandler(
   req: RequestWithParams<{ id: string }>,
@@ -13,11 +12,9 @@ export async function getBlogHandler(
 ) {
   try {
     const id = req.params.id
-    const blog = await blogsService.findByIdOrFail(id)
+    const blog = await blogsQueryRepository.findByIdOrFail(id)
 
-    const blogViewModel = mapToBlogListViewModel(blog)
-
-    res.json(blogViewModel)
+    res.json(blog)
   } catch (e) {
     errorsHandlers(e, res)
   }

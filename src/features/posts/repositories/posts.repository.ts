@@ -29,7 +29,7 @@ export const postsRepository = {
   async findById(id: string): Promise<WithId<Post> | null> {
     return postsCollection.findOne({ _id: new ObjectId(id) })
   },
-  async findByIdOrFailed(id: string): Promise<WithId<Post>> {
+  async findByIdOrFail(id: string): Promise<WithId<Post>> {
     const res = await postsCollection.findOne({ _id: new ObjectId(id) })
 
     if (!res) {
@@ -65,15 +65,12 @@ export const postsRepository = {
       totalCount,
     }
   },
-  async create(post: Post): Promise<WithId<Post>> {
+  async create(post: Post): Promise<string> {
     const insertResult = await postsCollection.insertOne({
       ...post,
     })
 
-    return {
-      ...post,
-      _id: insertResult.insertedId,
-    }
+    return insertResult.insertedId.toString()
   },
   async delete(id: string): Promise<void> {
     const deleteResult = await postsCollection.deleteOne({
