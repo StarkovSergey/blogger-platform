@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { PostViewModel } from '../../models/PostViewModel.js'
+import { PostViewModel } from '../../types/output/PostViewModel.js'
 import { mapToPostViewModel } from '../mappers/map-to-post-view-model.js'
 import { postsService } from '../../application/posts.service.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'

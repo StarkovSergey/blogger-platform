@@ -1,8 +1,8 @@
 import { ObjectId, WithId } from 'mongodb'
-import { Post } from '../types/post.js'
+import { PostDB } from '../types/postDB.js'
 import { postsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
-import { PostViewModel } from '../models/PostViewModel.js'
+import { PostViewModel } from '../types/output/PostViewModel.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 
@@ -66,7 +66,7 @@ export const postsQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
     }
   },
-  _mapToPostViewModel(post: WithId<Post>): PostViewModel {
+  _mapToPostViewModel(post: WithId<PostDB>): PostViewModel {
     return {
       id: post._id.toString(),
       title: post.title,

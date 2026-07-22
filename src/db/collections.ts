@@ -1,18 +1,17 @@
 import { Collection, Db } from 'mongodb'
-import { PostViewModel } from '../features/posts/models/PostViewModel.js'
 
-import { Blog } from '../features/blogs/types/blog.js'
-import { Post } from '../features/posts/types/post.js'
+import { BlogDB } from '../features/blogs/types/blogDB.js'
+import { PostDB } from '../features/posts/types/postDB.js'
 
 export const BLOG_COLLECTION_NAME = 'blogs'
 export const POST_COLLECTION_NAME = 'posts'
 
-export let blogsCollection: Collection<Blog>
-export let postsCollection: Collection<Post>
+export let blogsCollection: Collection<BlogDB>
+export let postsCollection: Collection<PostDB>
 
 export function initCollections(db: Db) {
-  blogsCollection = db.collection<Blog>(BLOG_COLLECTION_NAME)
-  postsCollection = db.collection<Post>(POST_COLLECTION_NAME)
+  blogsCollection = db.collection<BlogDB>(BLOG_COLLECTION_NAME)
+  postsCollection = db.collection<PostDB>(POST_COLLECTION_NAME)
 }
 
 export function getAllCollections(): Collection<any>[] {

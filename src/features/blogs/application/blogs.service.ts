@@ -1,18 +1,18 @@
 import { WithId } from 'mongodb'
-import { Blog, BlogErrorCode } from '../types/blog.js'
+import { BlogDB, BlogErrorCode } from '../types/blogDB.js'
 import { blogsRepository } from '../repositories/blogs.repository.js'
-import { BlogInputModel } from '../models/BlogInputModel.js'
+import { BlogInputModel } from '../types/input/BlogInputModel.js'
 import { DomainException } from '../../../core/exeptions/domain.exception.js'
-import { Post } from '../../posts/types/post.js'
+import { PostDB } from '../../posts/types/postDB.js'
 import { postsRepository } from '../../posts/repositories/posts.repository.js'
-import { BlogPostInputModel } from '../models/BlogPostInputModel.js'
+import { BlogPostInputModel } from '../types/input/BlogPostInputModel.js'
 
 export const blogsService = {
-  async findByIdOrFail(id: string): Promise<WithId<Blog>> {
+  async findByIdOrFail(id: string): Promise<WithId<BlogDB>> {
     return blogsRepository.findByIdOrFail(id)
   },
   async create(blog: BlogInputModel): Promise<string> {
-    const newBlog: Blog = {
+    const newBlog: BlogDB = {
       ...blog,
       isMembership: false,
       createdAt: new Date(),
@@ -26,7 +26,7 @@ export const blogsService = {
   ): Promise<string> {
     const blog = await blogsRepository.findByIdOrFail(blogId)
 
-    const newPost: Post = {
+    const newPost: PostDB = {
       ...dto,
       blogId,
       createdAt: new Date(),

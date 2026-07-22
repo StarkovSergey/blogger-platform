@@ -2,7 +2,7 @@ import type {
   ApiResponse,
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
-import { PostViewModel } from '../../models/PostViewModel.js'
+import { PostViewModel } from '../../types/output/PostViewModel.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 import { postsQueryRepository } from '../../repositories/posts.query.repository.js'
 

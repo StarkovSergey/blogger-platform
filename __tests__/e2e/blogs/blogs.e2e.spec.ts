@@ -7,7 +7,7 @@ import { PATHS } from '../../../src/core/paths/paths.js'
 import { HttpStatus } from '../../../src/common/constants/constants.js'
 import { generateAdminAuthToken } from '../../utils/generate-admin-auth-token.js'
 import { blogsTestClient } from '../../utils/test-clients/blogs-test-client.js'
-import { BlogInputModel } from '../../../src/features/blogs/models/BlogInputModel.js'
+import { BlogInputModel } from '../../../src/features/blogs/types/input/BlogInputModel.js'
 import { runDB, stopDb } from '../../../src/db/mongo.db.js'
 import { SETTINGS } from '../../../src/settings/config.js'
 

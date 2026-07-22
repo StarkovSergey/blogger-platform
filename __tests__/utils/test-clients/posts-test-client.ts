@@ -1,10 +1,10 @@
 import { Express } from 'express'
-import { PostInputModel } from '../../../src/features/posts/models/PostInputModel.js'
+import { PostInputModel } from '../../../src/features/posts/types/input/PostInputModel.js'
 import request from 'supertest'
 import { PATHS } from '../../../src/core/paths/paths.js'
 import { generateAdminAuthToken } from '../generate-admin-auth-token.js'
 import { HttpStatus } from '../../../src/common/constants/constants.js'
-import { PostViewModel } from '../../../src/features/posts/models/PostViewModel.js'
+import { PostViewModel } from '../../../src/features/posts/types/output/PostViewModel.js'
 
 export const VALID_POST_INPUT: Omit<PostInputModel, 'blogId'> = {
   title: 'Some title',

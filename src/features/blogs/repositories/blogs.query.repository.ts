@@ -1,10 +1,10 @@
 import { BlogQueryInput } from '../types/input/blog-query-input.js'
 import { ObjectId, WithId } from 'mongodb'
-import { Blog } from '../types/blog.js'
+import { BlogDB } from '../types/blogDB.js'
 import { escapeRegExp } from '../../../common/helpers/escape-reg-exp.js'
 import { blogsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
-import { BlogViewModel } from '../models/BlogViewModel.js'
+import { BlogViewModel } from '../types/output/BlogViewModel.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 
 export const blogsQueryRepository = {
@@ -37,7 +37,7 @@ export const blogsQueryRepository = {
       page: pageNumber,
     }
   },
-  async findById(id: string): Promise<WithId<Blog> | null> {
+  async findById(id: string): Promise<WithId<BlogDB> | null> {
     return blogsCollection.findOne({ _id: new ObjectId(id) })
   },
   async findByIdOrFail(id: string): Promise<BlogViewModel> {
@@ -49,7 +49,7 @@ export const blogsQueryRepository = {
 
     return this._mapToBlogListViewModel(res)
   },
-  _mapToBlogListViewModel(blog: WithId<Blog>): BlogViewModel {
+  _mapToBlogListViewModel(blog: WithId<BlogDB>): BlogViewModel {
     return {
       id: blog._id.toString(),
       websiteUrl: blog.websiteUrl,

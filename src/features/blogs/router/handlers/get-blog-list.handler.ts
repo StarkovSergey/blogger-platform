@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { BlogViewModel } from '../../models/BlogViewModel.js'
+import { BlogViewModel } from '../../types/output/BlogViewModel.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 import { RequestWithQuery } from '../../../../core/types/utils-types.js'
 import { BlogQueryInput } from '../../types/input/blog-query-input.js'

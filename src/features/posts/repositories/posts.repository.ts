@@ -1,13 +1,13 @@
-import { PostInputModel } from '../models/PostInputModel.js'
+import { PostInputModel } from '../types/input/PostInputModel.js'
 import { ObjectId, WithId } from 'mongodb'
-import { Post } from '../types/post.js'
+import { PostDB } from '../types/postDB.js'
 import { postsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 
 export const postsRepository = {
   async findMany(queryDto: PostQueryInput): Promise<{
-    items: WithId<Post>[]
+    items: WithId<PostDB>[]
     totalCount: number
   }> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto
@@ -26,10 +26,10 @@ export const postsRepository = {
 
     return { items, totalCount }
   },
-  async findById(id: string): Promise<WithId<Post> | null> {
+  async findById(id: string): Promise<WithId<PostDB> | null> {
     return postsCollection.findOne({ _id: new ObjectId(id) })
   },
-  async findByIdOrFail(id: string): Promise<WithId<Post>> {
+  async findByIdOrFail(id: string): Promise<WithId<PostDB>> {
     const res = await postsCollection.findOne({ _id: new ObjectId(id) })
 
     if (!res) {
@@ -38,34 +38,7 @@ export const postsRepository = {
 
     return res
   },
-  async findPostsByBlog(
-    blogId: string,
-    queryDto: PostQueryInput
-  ): Promise<{
-    items: WithId<Post>[]
-    totalCount: number
-  }> {
-    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto
-    const skip = (pageNumber - 1) * pageSize
-
-    const [items, totalCount] = await Promise.all([
-      postsCollection
-        .find({
-          blogId,
-        })
-        .sort({ [sortBy]: sortDirection })
-        .skip(skip)
-        .limit(pageSize)
-        .toArray(),
-      postsCollection.countDocuments({ blogId }),
-    ])
-
-    return {
-      items,
-      totalCount,
-    }
-  },
-  async create(post: Post): Promise<string> {
+  async create(post: PostDB): Promise<string> {
     const insertResult = await postsCollection.insertOne({
       ...post,
     })

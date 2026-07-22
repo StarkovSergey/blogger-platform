@@ -3,8 +3,8 @@ import { type RequestWithParamsAndBody } from '../../../../core/types/utils-type
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { blogsService } from '../../application/blogs.service.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
-import { BlogPostInputModel } from '../../models/BlogPostInputModel.js'
-import { PostViewModel } from '../../../posts/models/PostViewModel.js'
+import { BlogPostInputModel } from '../../types/input/BlogPostInputModel.js'
+import { PostViewModel } from '../../../posts/types/output/PostViewModel.js'
 import { postsQueryRepository } from '../../../posts/repositories/posts.query.repository.js'
 
 export async function createBlogPostHandler(

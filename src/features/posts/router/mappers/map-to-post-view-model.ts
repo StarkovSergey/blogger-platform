@@ -1,8 +1,8 @@
 import { WithId } from 'mongodb'
-import { Post } from '../../types/post.js'
-import { PostViewModel } from '../../models/PostViewModel.js'
+import { PostDB } from '../../types/postDB.js'
+import { PostViewModel } from '../../types/output/PostViewModel.js'
 
-export const mapToPostViewModel = (post: WithId<Post>): PostViewModel => {
+export const mapToPostViewModel = (post: WithId<PostDB>): PostViewModel => {
   return {
     id: post._id.toString(),
     title: post.title,

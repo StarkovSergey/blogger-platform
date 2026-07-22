@@ -1,24 +1,24 @@
 import { postsRepository } from '../repositories/posts.repository.js'
 import { WithId } from 'mongodb'
-import { Post } from '../types/post.js'
-import { PostInputModel } from '../models/PostInputModel.js'
+import { PostDB } from '../types/postDB.js'
+import { PostInputModel } from '../types/input/PostInputModel.js'
 import { blogsRepository } from '../../blogs/repositories/blogs.repository.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 
 export const postsService = {
   async findMany(queryDto: PostQueryInput): Promise<{
-    items: WithId<Post>[]
+    items: WithId<PostDB>[]
     totalCount: number
   }> {
     return postsRepository.findMany(queryDto)
   },
-  async findByIdOrFailed(id: string): Promise<WithId<Post>> {
+  async findByIdOrFailed(id: string): Promise<WithId<PostDB>> {
     return postsRepository.findByIdOrFail(id)
   },
   async createPost(dto: PostInputModel) {
     const blog = await blogsRepository.findByIdOrFail(dto.blogId)
 
-    const post: Post = {
+    const post: PostDB = {
       ...dto,
       createdAt: new Date(),
       blogName: blog.name,

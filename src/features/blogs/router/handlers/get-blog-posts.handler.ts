@@ -1,6 +1,6 @@
 import { RequestWithParamsAndQuery } from '../../../../core/types/utils-types.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
-import { PostViewModel } from '../../../posts/models/PostViewModel.js'
+import { PostViewModel } from '../../../posts/types/output/PostViewModel.js'
 import { PostQueryInput } from '../../../posts/types/input/post-query-input.js'
 import { Response } from 'express'
 import { Pagination } from '../../../../core/types/paginated-output.js'
