@@ -3,16 +3,12 @@ import { BlogViewModel } from '../../types/output/BlogViewModel.js'
 import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
 import { RequestWithQuery } from '../../../../core/types/utils-types.js'
 import { BlogQueryInput } from '../../types/input/blog-query-input.js'
-import { PaginatedOutput } from '../../../../core/types/paginated-output.js'
+import { Pagination } from '../../../../core/types/paginated-output.js'
 import { blogsQueryRepository } from '../../repositories/blogs.query.repository.js'
 
 export const getBlogListHandler = async (
   req: RequestWithQuery<BlogQueryInput>,
-  res: Response<
-    {
-      items: BlogViewModel[]
-    } & PaginatedOutput
-  >
+  res: Response<Pagination<BlogViewModel>>
 ) => {
   try {
     const queryInput = req.query

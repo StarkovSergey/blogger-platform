@@ -14,6 +14,21 @@ export function errorsHandlers(error: unknown, res: Response) {
   }
 
   if (error instanceof DomainException) {
+    // бизнес-ошибка с привязкой к полю → как validation 400
+    if (error.source) {
+      res.status(HttpStatus.BAD_REQUEST_400).json(
+        createErrorsMessages([
+          {
+            message: error.message,
+            field: error.source,
+          },
+        ])
+      )
+
+      return
+    }
+
+    // остальные domain (типа HasPosts) → 409
     res.status(HttpStatus.CONFLICT_409).send(
       createErrorsMessages([
         {

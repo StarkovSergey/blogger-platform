@@ -8,7 +8,6 @@ import type { BlogViewModel } from '../../../src/features/blogs/types/output/Blo
 import { BlogPostInputModel } from '../../../src/features/blogs/types/input/BlogPostInputModel.js'
 import { VALID_POST_INPUT } from './posts-test-client.js'
 import { PostViewModel } from '../../../src/features/posts/types/output/PostViewModel.js'
-import { BLOGS_PATHS } from '../../../src/features/blogs/router/blogs.router.js'
 import { PaginatedOutput } from '../../../src/core/types/paginated-output.js'
 
 export const VALID_BLOG_INPUT: BlogInputModel = {
