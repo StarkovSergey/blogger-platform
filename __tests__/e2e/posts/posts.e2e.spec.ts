@@ -34,9 +34,9 @@ describe('Posts API', () => {
     await stopDb()
   })
 
-  it('should create post; POST /api/posts', () => {
+  it('should create post; POST /api/posts', async () => {
     const post = createValidPostInput(blogId)
-    postsTestClient.createPost(app, post)
+    await postsTestClient.createPost(app, post)
   })
 
   it('should return post list; GET /api/posts', async () => {
