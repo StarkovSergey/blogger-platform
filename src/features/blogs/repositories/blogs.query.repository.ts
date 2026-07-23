@@ -3,7 +3,7 @@ import { ObjectId, WithId } from 'mongodb'
 import { BlogDB } from '../types/blogDB.js'
 import { escapeRegExp } from '../../../common/helpers/escape-reg-exp.js'
 import { blogsCollection } from '../../../db/collections.js'
-import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
+import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { BlogViewModel } from '../types/output/BlogViewModel.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 

@@ -5,7 +5,7 @@ import { escapeRegExp } from '../../../common/helpers/escape-reg-exp.js'
 import { usersCollection } from '../../../db/collections.js'
 import { ObjectId, WithId } from 'mongodb'
 import { UserDB } from '../types/userDB.js'
-import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
+import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 
 export const usersQueryRepository = {
   async findMany(queryDto: UserQueryInput): Promise<Pagination<UserViewModel>> {

@@ -4,6 +4,7 @@ import { PATHS } from './core/paths/paths.js'
 import { testsRouter } from './features/tests/tests.router.js'
 import { postsRouter } from './features/posts/router/posts.router.js'
 import { usersRouter } from './features/users/router/users.router.js'
+import { authRouter } from './features/auth/router/auth.router.js'
 
 export const setupApp = (app: Express) => {
   app.use(express.json())
@@ -12,6 +13,7 @@ export const setupApp = (app: Express) => {
     res.status(200).send('Hello world')
   })
 
+  app.use(PATHS.auth, authRouter)
   app.use(PATHS.blogs, blogsRouter)
   app.use(PATHS.posts, postsRouter)
   app.use(PATHS.users, usersRouter)

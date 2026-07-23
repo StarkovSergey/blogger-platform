@@ -3,7 +3,7 @@ import type {
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
 import { PostViewModel } from '../../types/output/PostViewModel.js'
-import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
+import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
 import { postsQueryRepository } from '../../repositories/posts.query.repository.js'
 
 export async function getPostHandler(

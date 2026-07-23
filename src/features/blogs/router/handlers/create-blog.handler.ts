@@ -3,8 +3,8 @@ import { RequestWithBody } from '../../../../core/types/utils-types.js'
 import { BlogInputModel } from '../../types/input/BlogInputModel.js'
 import { BlogViewModel } from '../../types/output/BlogViewModel.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
-import { blogsService } from '../../application/blogs.service.js'
-import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
+import { blogsService } from '../../services/blogs.service.js'
+import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
 import { blogsQueryRepository } from '../../repositories/blogs.query.repository.js'
 
 export async function createBlogHandler(

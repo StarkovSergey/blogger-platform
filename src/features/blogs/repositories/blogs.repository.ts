@@ -3,7 +3,7 @@ import { blogsCollection } from '../../../db/collections.js'
 import { ObjectId, WithId } from 'mongodb'
 
 import { BlogDB } from '../types/blogDB.js'
-import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
+import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 
 export const blogsRepository = {
   async findByIdOrFail(id: string): Promise<WithId<BlogDB>> {

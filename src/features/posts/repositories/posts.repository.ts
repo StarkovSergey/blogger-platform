@@ -2,7 +2,7 @@ import { PostInputModel } from '../types/input/PostInputModel.js'
 import { ObjectId, WithId } from 'mongodb'
 import { PostDB } from '../types/postDB.js'
 import { postsCollection } from '../../../db/collections.js'
-import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
+import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 
 export const postsRepository = {

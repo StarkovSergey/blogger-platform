@@ -3,8 +3,15 @@ import { NotFoundException } from './not-found.exception.js'
 import { HttpStatus } from '../../common/constants/constants.js'
 import { createErrorsMessages } from '../../common/helpers/create-errors-messages.js'
 import { DomainException } from './domain.exception.js'
+import { UnauthorizedException } from './unauthorized.exception.js'
 
 export function errorsHandlers(error: unknown, res: Response) {
+  if (error instanceof UnauthorizedException) {
+    res.sendStatus(HttpStatus.UNAUTHORIZED_401)
+
+    return
+  }
+
   if (error instanceof NotFoundException) {
     res
       .status(HttpStatus.NOT_FOUND_404)

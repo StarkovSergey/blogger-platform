@@ -5,4 +5,5 @@ export const PATHS = {
   blogs: `${API}/blogs`,
   posts: `${API}/posts`,
   users: `${API}/users`,
+  auth: `${API}/auth`,
 } as const

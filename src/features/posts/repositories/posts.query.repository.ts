@@ -1,7 +1,7 @@
 import { ObjectId, WithId } from 'mongodb'
 import { PostDB } from '../types/postDB.js'
 import { postsCollection } from '../../../db/collections.js'
-import { NotFoundException } from '../../../core/exeptions/not-found.exception.js'
+import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { PostViewModel } from '../types/output/PostViewModel.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'

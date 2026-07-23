@@ -3,8 +3,8 @@ import {
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
-import { postsService } from '../../application/posts.service.js'
-import { errorsHandlers } from '../../../../core/exeptions/errors-handlers.js'
+import { postsService } from '../../services/posts.service.js'
+import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
 
 export async function deletePostHandler(
   req: RequestWithParams<{ id: string }>,

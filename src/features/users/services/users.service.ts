@@ -2,7 +2,7 @@ import { UserInputModel } from '../types/input/UserInputModel.js'
 import bcrypt from 'bcrypt'
 import { UserDB } from '../types/userDB.js'
 import { usersRepository } from '../repositories/users.repository.js'
-import { DomainException } from '../../../core/exeptions/domain.exception.js'
+import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { UserErrorCode } from '../types/user-error-code.js'
 
 export const usersService = {
