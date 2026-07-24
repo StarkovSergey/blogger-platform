@@ -1,9 +1,9 @@
 import { UserInputModel } from '../types/input/UserInputModel.js'
-import bcrypt from 'bcrypt'
 import { UserDB } from '../types/userDB.js'
 import { usersRepository } from '../repositories/users.repository.js'
 import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { UserErrorCode } from '../types/user-error-code.js'
+import { hashService } from '../../../core/adapters/hash.service.js'
 
 export const usersService = {
   async create(userDto: UserInputModel): Promise<string> {
@@ -25,7 +25,7 @@ export const usersService = {
       )
     }
 
-    const hash = await bcrypt.hash(userDto.password, 12)
+    const hash = await hashService.generateHash(userDto.password)
     const newUser: UserDB = {
       login: userDto.login,
       email: userDto.email,

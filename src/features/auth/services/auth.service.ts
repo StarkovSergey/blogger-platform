@@ -1,7 +1,7 @@
 import { LoginInputModel } from '../types/input/login-input-model.js'
 import { usersRepository } from '../../users/repositories/users.repository.js'
 import { UnauthorizedException } from '../../../core/exceptions/unauthorized.exception.js'
-import bcrypt from 'bcrypt'
+import { hashService } from '../../../core/adapters/hash.service.js'
 
 export const authService = {
   async login(loginDto: LoginInputModel) {
@@ -11,7 +11,7 @@ export const authService = {
       throw new UnauthorizedException()
     }
 
-    const isCorrectCredentials = await bcrypt.compare(
+    const isCorrectCredentials = await hashService.checkPassword(
       loginDto.password,
       user.passwordHash
     )
