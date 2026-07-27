@@ -19,6 +19,11 @@ export const usersRepository = {
 
     return
   },
+  async findById(id: string) {
+    return usersCollection.findOne({
+      _id: new ObjectId(id),
+    })
+  },
   async findByLogin(login: string) {
     return usersCollection.findOne({
       login,

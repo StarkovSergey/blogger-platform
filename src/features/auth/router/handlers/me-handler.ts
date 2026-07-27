@@ -3,7 +3,7 @@ import { Request } from 'express'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { authQueryService } from '../../services/auth.query.service.js'
 import { ResultStatus } from '../../../../common/result/result.js'
-import { resultCodeToHttpException } from '../../../../common/result/resultCodeToHttpException.js'
+import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
 import { ApiResponse } from '../../../../core/types/utils-types.js'
 
 export async function meHandler(req: Request, res: ApiResponse<MeViewModel>) {
@@ -17,7 +17,7 @@ export async function meHandler(req: Request, res: ApiResponse<MeViewModel>) {
     const result = await authQueryService.me(userId)
 
     if (result.status !== ResultStatus.Success) {
-      return res.status(resultCodeToHttpException(result.status)).send({
+      return res.status(resultStatusToHttpStatusCode(result.status)).send({
         errorsMessages: result.extensions,
       })
     }

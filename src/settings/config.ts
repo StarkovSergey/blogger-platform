@@ -1,5 +1,3 @@
-import { SignOptions } from 'jsonwebtoken'
-
 const env = process.env
 
 export const ADMIN_USERNAME = env.ADMIN_USERNAME || 'admin'

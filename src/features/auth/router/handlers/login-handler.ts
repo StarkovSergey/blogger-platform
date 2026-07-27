@@ -7,7 +7,7 @@ import { authService } from '../../services/auth.service.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { LoginSuccessViewModel } from '../../types/output/LoginSuccessViewModel.js'
 import { ResultStatus } from '../../../../common/result/result.js'
-import { resultCodeToHttpException } from '../../../../common/result/resultCodeToHttpException.js'
+import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
 
 export async function loginHandler(
   req: RequestWithBody<LoginInputModel>,
@@ -17,7 +17,7 @@ export async function loginHandler(
     const result = await authService.login(req.body)
 
     if (result.status !== ResultStatus.Success) {
-      return res.status(resultCodeToHttpException(result.status)).send({
+      return res.status(resultStatusToHttpStatusCode(result.status)).send({
         errorsMessages: result.extensions,
       })
     }

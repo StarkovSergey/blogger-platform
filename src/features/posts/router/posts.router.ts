@@ -12,10 +12,16 @@ import { createPostInputModelValidationChain } from '../validation/post.input-mo
 import { paginationAndSortingValidation } from '../../../core/middleware/validation/query-pagination-sorting.validation.middleware.js'
 import { PostSortField } from '../types/input/post-sort-field.js'
 import { sanitizeQueryMiddleware } from '../../../core/middleware/validation/sanitize-query.middleware.js'
+import { CommentSortField } from '../../comments/types/input/comment-sort-field.js'
+import { getPostCommentsHandler } from './handlers/get-post-comments.handler.js'
+import { accessTokenGuard } from '../../../core/middleware/validation/access-token-guard.middleware.js'
+import { createCommentInputModelValidationChain } from '../../comments/validation/comment.input-model.validation.js'
+import { createCommentHandler } from './handlers/create-comment.handler.js'
 
 export const POSTS_PATHS = {
   ROOT: '',
   BY_ID: '/:id',
+  COMMENTS: '/:id/comments',
 }
 
 export const postsRouter = Router()
@@ -35,12 +41,30 @@ postsRouter.get(
   getPostHandler
 )
 
+postsRouter.get(
+  POSTS_PATHS.COMMENTS,
+  paramsIdValidationMiddleware,
+  paginationAndSortingValidation(CommentSortField),
+  inputValidationResultMiddleware,
+  sanitizeQueryMiddleware,
+  getPostCommentsHandler as unknown as RequestHandler
+)
+
 postsRouter.post(
   POSTS_PATHS.ROOT,
   superAdminGuardMiddleware,
   createPostInputModelValidationChain(),
   inputValidationResultMiddleware,
   createPostHandler
+)
+
+postsRouter.post(
+  POSTS_PATHS.COMMENTS,
+  paramsIdValidationMiddleware,
+  accessTokenGuard,
+  createCommentInputModelValidationChain(),
+  inputValidationResultMiddleware,
+  createCommentHandler
 )
 
 postsRouter.put(
