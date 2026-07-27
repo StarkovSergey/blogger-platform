@@ -1,19 +1,29 @@
-import { RequestWithBody } from '../../../../core/types/utils-types.js'
-import { Response } from 'express'
+import {
+  ApiResponse,
+  RequestWithBody,
+} from '../../../../core/types/utils-types.js'
 import { LoginInputModel } from '../../types/input/login-input-model.js'
-import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
 import { authService } from '../../services/auth.service.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
+import { LoginSuccessViewModel } from '../../types/output/LoginSuccessViewModel.js'
+import { ResultStatus } from '../../../../common/result/result.js'
+import { resultCodeToHttpException } from '../../../../common/result/resultCodeToHttpException.js'
 
 export async function loginHandler(
   req: RequestWithBody<LoginInputModel>,
-  res: Response
+  res: ApiResponse<LoginSuccessViewModel>
 ) {
   try {
-    await authService.login(req.body)
+    const result = await authService.login(req.body)
 
-    res.sendStatus(HttpStatus.NO_CONTENT_204)
+    if (result.status !== ResultStatus.Success) {
+      return res.status(resultCodeToHttpException(result.status)).send({
+        errorsMessages: result.extensions,
+      })
+    }
+
+    res.status(HttpStatus.OK_200).json({ accessToken: result.data.accessToken })
   } catch (e) {
-    errorsHandlers(e, res)
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR_500)
   }
 }

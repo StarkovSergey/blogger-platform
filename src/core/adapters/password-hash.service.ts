@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 
-export const hashService = {
+export const passwordHashService = {
   async generateHash(password: string) {
     return await bcrypt.hash(password, 12)
   },

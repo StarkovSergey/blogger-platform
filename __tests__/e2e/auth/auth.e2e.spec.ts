@@ -40,7 +40,7 @@ describe('Users API', () => {
     await request(app)
       .post(`${PATHS.auth}${AUTH_ROUTER_PATHS.LOGIN}`)
       .send(credentials)
-      .expect(HttpStatus.NO_CONTENT_204)
+      .expect(HttpStatus.OK_200)
   })
 
   it('POST -> "/auth/login": should return error if passed wrong password; status 401', async () => {

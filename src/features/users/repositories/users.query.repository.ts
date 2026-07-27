@@ -55,6 +55,11 @@ export const usersQueryRepository = {
       page: pageNumber,
     }
   },
+  async findById(id: string): Promise<UserViewModel | null> {
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) })
+
+    return user ? this._mapToUserListViewModel(user) : null
+  },
   async findByIdOrFail(id: string): Promise<UserViewModel> {
     const res = await usersCollection.findOne({ _id: new ObjectId(id) })
 

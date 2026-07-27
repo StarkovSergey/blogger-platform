@@ -3,7 +3,7 @@ import { UserDB } from '../types/userDB.js'
 import { usersRepository } from '../repositories/users.repository.js'
 import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { UserErrorCode } from '../types/user-error-code.js'
-import { hashService } from '../../../core/adapters/hash.service.js'
+import { passwordHashService } from '../../../core/adapters/password-hash.service.js'
 
 export const usersService = {
   async create(userDto: UserInputModel): Promise<string> {
@@ -25,7 +25,7 @@ export const usersService = {
       )
     }
 
-    const hash = await hashService.generateHash(userDto.password)
+    const hash = await passwordHashService.generateHash(userDto.password)
     const newUser: UserDB = {
       login: userDto.login,
       email: userDto.email,
