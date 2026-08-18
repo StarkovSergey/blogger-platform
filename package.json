@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --inspect --env-file=.env src/index.ts",
+    "dev": "tsx watch --inspect --env-file=.env.local src/index.ts",
     "build": "tsc",
     "start": "node --env-file=.env dist/index.js",
     "test": "vitest",
@@ -21,7 +21,8 @@
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
-    "mongodb": "^7.5.0"
+    "mongodb": "^7.5.0",
+    "nodemailer": "^9.0.5"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.5.0",
@@ -29,11 +30,12 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.3",
+    "@types/nodemailer": "^8.0.1",
     "@types/supertest": "^7.2.0",
+    "prettier": "^3.8.4",
     "supertest": "^7.2.2",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9",
-    "prettier": "^3.8.4"
+    "vitest": "^4.1.9"
   }
 }

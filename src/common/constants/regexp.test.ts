@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { URL_REGEXP } from './regexp.js'
+import { EMAIL_REGEXP, URL_REGEXP } from './regexp.js'
 
 describe('URL_REGEXP', () => {
   it('should accept valid https URLs', () => {
@@ -36,6 +36,24 @@ describe('URL_REGEXP', () => {
 
     invalidUrls.forEach((url) => {
       expect(URL_REGEXP.test(url)).toBe(false)
+    })
+  })
+})
+
+describe('EMAIL_REGEXP', () => {
+  it('should accept valid emails', () => {
+    const validEmails = ['example@example.com']
+
+    validEmails.forEach((email) => {
+      expect(EMAIL_REGEXP.test(email)).toBe(true)
+    })
+  })
+
+  it('should reject invalid emails', () => {
+    const invalidEmails = ['example.com']
+
+    invalidEmails.forEach((email) => {
+      expect(EMAIL_REGEXP.test(email)).toBe(false)
     })
   })
 })

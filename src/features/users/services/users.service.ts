@@ -31,6 +31,11 @@ export const usersService = {
       email: userDto.email,
       passwordHash: hash,
       createdAt: new Date(),
+      emailConfirmation: {
+        isConfirmed: true, // т.к. создаём через админа
+        confirmationCode: '',
+        expirationDate: new Date(),
+      },
     }
 
     return await usersRepository.create(newUser)

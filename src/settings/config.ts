@@ -12,4 +12,6 @@ export const SETTINGS = {
   DB_NAME: env.DB_NAME || 'blogger-platform',
   JWT_SECRET: process.env.JWT_SECRET || '123',
   JWT_TOKEN_EXP_TIME: process.env.JWT_TOKEN_EXP_TIME || '10m',
+  GMAIL_USER: process.env.GMAIL_USER,
+  GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD,
 }

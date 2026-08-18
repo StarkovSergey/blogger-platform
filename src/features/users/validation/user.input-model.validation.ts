@@ -1,4 +1,5 @@
 import { body } from 'express-validator'
+import { EMAIL_REGEXP } from '../../../common/constants/regexp.js'
 
 export const passwordValidation = body('password')
   .isString()
@@ -22,6 +23,6 @@ export const createUserInputModelValidationChain = () => [
     .withMessage('email should be a string')
     .trim()
     /** example: example@example.dev */
-    .matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
+    .matches(EMAIL_REGEXP)
     .withMessage('incorrect email; example: example@example.dev'),
 ]
