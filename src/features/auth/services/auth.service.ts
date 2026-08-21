@@ -16,17 +16,25 @@ export const authService = {
     email,
     password,
   }: RegistrationInputModel): Promise<Result> {
-    const isUserExists = await usersRepository.doesExistByLoginOrEmail(
-      login,
-      email
-    )
+    const isEmailExists = await usersRepository.findByEmail(email)
 
-    if (isUserExists) {
+    if (isEmailExists) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: 'Bad Request',
         data: null,
-        extensions: [{ field: 'loginOrEmail', message: 'Already Registered' }],
+        extensions: [{ field: 'email', message: 'Already Registered' }],
+      }
+    }
+
+    const isLoginExists = await usersRepository.findByLogin(login)
+
+    if (isLoginExists) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: 'Bad Request',
+        data: null,
+        extensions: [{ field: 'login', message: 'Already Registered' }],
       }
     }
 

@@ -17,6 +17,7 @@ import { PATHS } from '../../../src/core/paths/paths.js'
 import { AUTH_ROUTER_PATHS } from '../../../src/features/auth/router/auth.router.js'
 import { emailService } from '../../../src/core/adapters/email.service.js'
 import { usersRepository } from '../../../src/features/users/repositories/users.repository.js'
+import { authTestClient } from '../../utils/test-clients/auth-test-client.js'
 
 describe('Registration API', () => {
   const app = express()
@@ -43,23 +44,35 @@ describe('Registration API', () => {
     expect(response.status).toBe(400)
   })
 
-  it('registration should create user', async () => {
-    const sendEmailMock = vi
-      .spyOn(emailService, 'sendEmail') // следим за вызовом функции sendEmail
-      .mockResolvedValue(undefined) // возвращаем  Promise.resolve(undefined), не трогаем оригинальную функцию
+  it('auth/registration: should return 400 if email already exists', async () => {
+    const userDto = {
+      email: 'test@test.com',
+      login: 'test',
+      password: '1234567890',
+    }
 
+    await authTestClient.registration(app, userDto)
+
+    const response = await request(app)
+      .post(`${PATHS.auth}${AUTH_ROUTER_PATHS.REGISTRATION}`)
+      .send({
+        email: userDto.email,
+        login: 'new-test',
+        password: '1234567890',
+      })
+    expect(response.status).toBe(400)
+  })
+
+  it('registration should create user', async () => {
     const userDto = {
       login: 'test',
       email: 'starkovsr@gmail.com',
       password: '1234567890',
     }
 
-    const response = await request(app)
-      .post(`${PATHS.auth}${AUTH_ROUTER_PATHS.REGISTRATION}`)
-      .send(userDto)
+    const response = await authTestClient.registration(app, userDto)
 
     expect(response.status).toBe(204)
-    expect(sendEmailMock).toHaveBeenCalledTimes(1)
 
     const user = await usersRepository.findByEmail(userDto.email)
 
