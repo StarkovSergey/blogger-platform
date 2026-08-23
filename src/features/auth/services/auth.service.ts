@@ -64,7 +64,7 @@ export const authService = {
   },
   async login(
     loginDto: LoginInputModel
-  ): Promise<Result<LoginSuccessViewModel>> {
+  ): Promise<Result<LoginSuccessViewModel & { refreshToken: string }>> {
     const user = await usersRepository.findByLoginOrEmail(loginDto.loginOrEmail)
 
     const isCorrectCredentials = user
@@ -83,11 +83,13 @@ export const authService = {
       }
     }
 
-    const accessToken = await jwtService.createJWT(user._id.toString())
+    const userId = user._id.toString()
+    const accessToken = await jwtService.createJWT(userId)
+    const refreshToken = await jwtService.createRefreshJWT(userId)
 
     return {
       status: ResultStatus.Success,
-      data: { accessToken },
+      data: { accessToken, refreshToken },
       extensions: [],
     }
   },

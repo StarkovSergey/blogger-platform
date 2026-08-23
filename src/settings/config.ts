@@ -11,7 +11,10 @@ export const SETTINGS = {
   MONGO_URL_TEST: env.MONGO_URL_TEST || 'mongodb://localhost:27017',
   DB_NAME: env.DB_NAME || 'blogger-platform',
   JWT_SECRET: process.env.JWT_SECRET || '123',
-  JWT_TOKEN_EXP_TIME: process.env.JWT_TOKEN_EXP_TIME || '10m',
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || '333',
+  JWT_TOKEN_EXP_TIME_SECONDS: process.env.JWT_TOKEN_EXP_TIME_SECONDS || 10,
+  JWT_REFRESH_TOKEN_EXP_TIME_SECONDS:
+    process.env.JWT_REFRESH_TOKEN_EXP_TIME_SECONDS || 20,
   GMAIL_USER: process.env.GMAIL_USER,
   GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD,
 }

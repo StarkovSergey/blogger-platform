@@ -10,6 +10,9 @@ import { registrationConfirmationHandler } from './handlers/registration-confirm
 import { createUserInputModelValidationChain } from '../../users/validation/user.input-model.validation.js'
 import { createEmailResendingInputModelValidationChain } from '../validation/email-resending.input-model.validation.js'
 import { registrationEmailResendingHandler } from './handlers/registration-email-resending.js'
+import { refreshTokenGuard } from '../../../core/middleware/validation/refresh-token-guard.middleware.js'
+import { refreshTokenHandler } from './handlers/refresh-token.handler.js'
+import { logoutHandler } from './handlers/logout.handler.js'
 
 export const AUTH_ROUTER_PATHS = {
   ROOT: '',
@@ -18,6 +21,8 @@ export const AUTH_ROUTER_PATHS = {
   REGISTRATION: '/registration',
   REGISTRATION_CONFIRMATION: '/registration-confirmation',
   REGISTRATION_EMAIL_RESENDING: '/registration-email-resending',
+  REFRESH_TOKEN: '/refresh-token',
+  LOGOUT: '/logout',
 } as const
 
 export const authRouter = Router()
@@ -51,3 +56,11 @@ authRouter.post(
   inputValidationResultMiddleware,
   registrationEmailResendingHandler
 )
+
+authRouter.post(
+  AUTH_ROUTER_PATHS.REFRESH_TOKEN,
+  refreshTokenGuard,
+  refreshTokenHandler
+)
+
+authRouter.post(AUTH_ROUTER_PATHS.LOGOUT, refreshTokenGuard, logoutHandler)

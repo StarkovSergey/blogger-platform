@@ -4,8 +4,7 @@ import {
   beforeEach,
   describe,
   expect,
-  it,
-  vi,
+  it
 } from 'vitest'
 import express from 'express'
 import { setupApp } from '../../../src/setup-app.js'
@@ -15,7 +14,6 @@ import { clearDb } from '../../utils/clear-db.js'
 import request from 'supertest'
 import { PATHS } from '../../../src/core/paths/paths.js'
 import { AUTH_ROUTER_PATHS } from '../../../src/features/auth/router/auth.router.js'
-import { emailService } from '../../../src/core/adapters/email.service.js'
 import { usersRepository } from '../../../src/features/users/repositories/users.repository.js'
 import { authTestClient } from '../../utils/test-clients/auth-test-client.js'
 

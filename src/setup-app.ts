@@ -6,9 +6,11 @@ import { postsRouter } from './features/posts/router/posts.router.js'
 import { usersRouter } from './features/users/router/users.router.js'
 import { authRouter } from './features/auth/router/auth.router.js'
 import { commentsRouter } from './features/comments/router/comments.router.js'
+import cookieParser from 'cookie-parser'
 
 export const setupApp = (app: Express) => {
   app.use(express.json())
+  app.use(cookieParser())
 
   app.get('/', (req, res) => {
     res.status(200).send('Hello world')

@@ -6,12 +6,12 @@ export let client: MongoClient
 
 export async function runDB(url: string) {
   client = new MongoClient(url)
-  const db: Db = client.db(SETTINGS.DB_NAME)
-
-  initCollections(db)
 
   try {
     await client.connect()
+    const db: Db = client.db(SETTINGS.DB_NAME)
+
+    await initCollections(db)
     console.log('✅ Connected to the database')
   } catch (e) {
     await client.close()
