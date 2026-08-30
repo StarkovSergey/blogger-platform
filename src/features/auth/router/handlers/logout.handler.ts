@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
-import { refreshBlackListService } from '../../services/refresh-black-list.service.js'
 import { REFRESH_TOKEN_COOKIE_KEY } from '../../utils/constants.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
+import { authService } from '../../services/auth.service.js'
 
 export async function logoutHandler(req: Request, res: Response) {
   try {
-    const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_KEY] as string
-    const result = await refreshBlackListService.add({
-      refreshToken,
-      userId: req.user?.id as string,
-    })
+    const refreshTokenPayload = req.refreshPayload
+    if (!refreshTokenPayload) {
+      return res.sendStatus(HttpStatus.UNAUTHORIZED_401)
+    }
+    const result = await authService.logout(refreshTokenPayload)
 
     if (result.status !== ResultStatus.Success) {
       return res.status(resultStatusToHttpStatusCode(result.status)).send({

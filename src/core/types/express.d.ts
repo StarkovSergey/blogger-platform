@@ -1,3 +1,5 @@
+import { RefreshTokenPayload } from '../adapters/jwt.service.js'
+
 declare global {
   namespace Express {
     interface Request {
@@ -5,10 +7,7 @@ declare global {
       user?: {
         id: string
       }
+      refreshPayload?: RefreshTokenPayload
     }
   }
 }
-
-// TODO: разобрать, зачем здесь export и нужен ли он здесь
-// нужен, чтобы сделать файл модулем; declare global можно писать только в модуле
-export {}

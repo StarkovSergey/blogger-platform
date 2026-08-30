@@ -16,7 +16,10 @@ export async function loginHandler(
   res: ApiResponse<LoginSuccessViewModel>
 ) {
   try {
-    const result = await authService.login(req.body)
+    const result = await authService.login(req.body, {
+      ip: req.ip ?? 'unknown',
+      deviceName: req.headers['user-agent'] ?? 'unknown',
+    })
 
     if (result.status !== ResultStatus.Success) {
       return res.status(resultStatusToHttpStatusCode(result.status)).send({

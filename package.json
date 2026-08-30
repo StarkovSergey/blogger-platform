@@ -10,6 +10,7 @@
     "start": "node --env-file=.env dist/index.js",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:debug": "vitest --inspect-brk --no-file-parallelism --pool=forks --fileParallelism=false",
     "ngrok": "ngrok http 5001"
   },
   "keywords": [],

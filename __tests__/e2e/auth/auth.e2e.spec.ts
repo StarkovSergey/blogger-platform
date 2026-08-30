@@ -15,6 +15,7 @@ import { HttpStatus } from '../../../src/common/constants/constants.js'
 import { AUTH_ROUTER_PATHS } from '../../../src/features/auth/router/auth.router.js'
 import { REFRESH_TOKEN_COOKIE_KEY } from '../../../src/features/auth/utils/constants.js'
 import { authTestClient } from '../../utils/test-clients/auth-test-client.js'
+import { sessionsRepository } from '../../../src/features/auth/repositories/sessions.repository.js'
 
 describe('Users API', () => {
   const app = express()
@@ -79,5 +80,29 @@ describe('Users API', () => {
       .set('Cookie', loginResponse.headers['set-cookie'])
       .send(credentials)
       .expect(HttpStatus.NO_CONTENT_204)
+  })
+
+  it('should create 4 sessions for the same user with different user-agents', async () => {
+    await usersTestClient.createUser(app, VALID_USER_INPUT)
+    const credentials: LoginInputModel = {
+      loginOrEmail: VALID_USER_INPUT.login,
+      password: VALID_USER_INPUT.password,
+    }
+    const userAgents = [
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15',
+      'Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Mobile/15E148',
+    ]
+    const loginResponses = await Promise.all(
+      userAgents.map((ua) => authTestClient.login(app, credentials, ua))
+    )
+    for (const res of loginResponses) {
+      expect(res.body.accessToken).toBeDefined()
+      expect(res.headers['set-cookie'][0]).toContain(REFRESH_TOKEN_COOKIE_KEY)
+    }
+
+    const databaseSessions = await sessionsRepository.findAllSessions()
+    expect(databaseSessions.length).toBe(userAgents.length)
   })
 })

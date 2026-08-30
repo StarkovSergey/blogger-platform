@@ -1,7 +1,11 @@
 import { LoginInputModel } from '../types/input/login-input-model.js'
 import { usersRepository } from '../../users/repositories/users.repository.js'
 import { passwordHashService } from '../../../core/adapters/password-hash.service.js'
-import { jwtService } from '../../../core/adapters/jwt.service.js'
+import {
+  jwtSecondsToDate,
+  jwtService,
+  RefreshTokenPayload,
+} from '../../../core/adapters/jwt.service.js'
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { LoginSuccessViewModel } from '../types/output/LoginSuccessViewModel.js'
 import { RegistrationInputModel } from '../types/input/registration-input-model.js'
@@ -9,6 +13,8 @@ import { EmailConfirmation, User } from '../../users/services/user.entity.js'
 import { emailService } from '../../../core/adapters/email.service.js'
 import { emailManager } from '../../../core/constants/managers/email-manager.js'
 import { randomUUID } from 'node:crypto'
+import { SessionDB } from '../types/sessionDB.js'
+import { sessionsRepository } from '../repositories/sessions.repository.js'
 
 export const authService = {
   async registerUser({
@@ -63,7 +69,8 @@ export const authService = {
     }
   },
   async login(
-    loginDto: LoginInputModel
+    loginDto: LoginInputModel,
+    meta: { ip: string; deviceName: string }
   ): Promise<Result<LoginSuccessViewModel & { refreshToken: string }>> {
     const user = await usersRepository.findByLoginOrEmail(loginDto.loginOrEmail)
 
@@ -84,8 +91,22 @@ export const authService = {
     }
 
     const userId = user._id.toString()
+    const deviceId = crypto.randomUUID()
     const accessToken = await jwtService.createJWT(userId)
-    const refreshToken = await jwtService.createRefreshJWT(userId)
+    const refreshToken = await jwtService.createRefreshJWT(userId, deviceId)
+
+    const refreshTokenPayload = jwtService.decodeToken(refreshToken)
+
+    const session: SessionDB = {
+      userId,
+      exp: jwtSecondsToDate(refreshTokenPayload.exp),
+      iat: jwtSecondsToDate(refreshTokenPayload.iat),
+      deviceId,
+      deviceName: meta.deviceName,
+      ip: meta.ip,
+    }
+
+    await sessionsRepository.addSession(session)
 
     return {
       status: ResultStatus.Success,
@@ -183,6 +204,73 @@ export const authService = {
       status: ResultStatus.Success,
       data: null,
       extensions: [],
+    }
+  },
+  async isSessionExist(iat: number, deviceId: string): Promise<boolean> {
+    const res = await sessionsRepository.findSession(
+      jwtSecondsToDate(iat),
+      deviceId
+    )
+
+    return Boolean(res)
+  },
+  async createNewTokensAndUpdateSession(
+    refreshTokenPayload: RefreshTokenPayload,
+    ip: string
+  ): Promise<Result<{ accessToken: string; newRefreshToken: string }>> {
+    const accessToken = await jwtService.createJWT(refreshTokenPayload.userId)
+    const newRefreshToken = await jwtService.createRefreshJWT(
+      refreshTokenPayload.userId,
+      refreshTokenPayload.deviceId
+    )
+
+    const newPayload = jwtService.decodeToken(newRefreshToken)
+
+    // update session
+    const isUpdated = await sessionsRepository.updateSession(
+      refreshTokenPayload.deviceId,
+      jwtSecondsToDate(refreshTokenPayload.iat),
+      {
+        iat: jwtSecondsToDate(newPayload.iat),
+        exp: jwtSecondsToDate(newPayload.exp),
+        ip,
+      }
+    )
+
+    if (!isUpdated) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: '',
+        data: null,
+        extensions: [],
+      }
+    }
+
+    return {
+      status: ResultStatus.Success,
+      data: { accessToken, newRefreshToken },
+      extensions: [],
+    }
+  },
+  async logout(refreshTokenPayload: RefreshTokenPayload): Promise<Result> {
+    const isSuccessDeleted = await sessionsRepository.deleteSession(
+      refreshTokenPayload.deviceId,
+      jwtSecondsToDate(refreshTokenPayload.iat)
+    )
+
+    if (isSuccessDeleted) {
+      return {
+        status: ResultStatus.Success,
+        extensions: [],
+        data: null,
+      }
+    }
+
+    return {
+      status: ResultStatus.Unauthorized,
+      extensions: [],
+      errorMessage: 'Some error',
+      data: null,
     }
   },
 }

@@ -2,7 +2,6 @@ import { commentsCollection } from '../../../db/collections.js'
 import { CommentDB } from '../types/commentDB.js'
 import { CommentInputModel } from '../types/input/CommentInputModel.js'
 import { ObjectId } from 'mongodb'
-import { CommentViewModel } from '../types/output/CommentViewModel.js'
 
 export const commentsRepository = {
   async findById(id: string) {

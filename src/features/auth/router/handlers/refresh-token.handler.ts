@@ -2,23 +2,28 @@ import { Request } from 'express'
 import { ApiResponse } from '../../../../core/types/utils-types.js'
 import { LoginSuccessViewModel } from '../../types/output/LoginSuccessViewModel.js'
 import { REFRESH_TOKEN_COOKIE_KEY } from '../../utils/constants.js'
-import { refreshBlackListService } from '../../services/refresh-black-list.service.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { SETTINGS } from '../../../../settings/config.js'
+import { authService } from '../../services/auth.service.js'
 
 export const refreshTokenHandler = async (
   req: Request,
   res: ApiResponse<LoginSuccessViewModel>
 ) => {
   try {
-    const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_KEY] as string
-    const userId = req.user?.id as string
+    const refreshPayload = req.refreshPayload
 
-    const result = await refreshBlackListService.createNewTokens(
-      refreshToken,
-      userId
+    if (!refreshPayload) {
+      return res.sendStatus(HttpStatus.UNAUTHORIZED_401)
+    }
+
+    const ip = req.ip ?? 'unknown'
+
+    const result = await authService.createNewTokensAndUpdateSession(
+      refreshPayload,
+      ip
     )
 
     if (result.status !== ResultStatus.Success) {
