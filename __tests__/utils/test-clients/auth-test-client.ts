@@ -32,4 +32,5 @@ export const authTestClient = {
 
     return response
   },
+  async createNewUserWithFourSession() {},
 }

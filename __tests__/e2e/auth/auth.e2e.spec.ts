@@ -16,6 +16,7 @@ import { AUTH_ROUTER_PATHS } from '../../../src/features/auth/router/auth.router
 import { REFRESH_TOKEN_COOKIE_KEY } from '../../../src/features/auth/utils/constants.js'
 import { authTestClient } from '../../utils/test-clients/auth-test-client.js'
 import { sessionsRepository } from '../../../src/features/auth/repositories/sessions.repository.js'
+import { SECURITY_ROUTER_PATHS } from '../../../src/features/security/router/security.router.js'
 
 describe('Users API', () => {
   const app = express()
@@ -104,5 +105,65 @@ describe('Users API', () => {
 
     const databaseSessions = await sessionsRepository.findAllSessions()
     expect(databaseSessions.length).toBe(userAgents.length)
+
+    const devices = await request(app)
+      .get(`${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}`)
+      .set('Cookie', loginResponses[0].headers['set-cookie'])
+
+    expect(devices.body.length).toBe(userAgents.length)
+
+    await new Promise((r) => setTimeout(r, 2000))
+
+    // update refresh token for device 1
+    const updatedRefreshToken = await request(app)
+      .post(`${PATHS.auth}${AUTH_ROUTER_PATHS.REFRESH_TOKEN}`)
+      .set('Cookie', loginResponses[0].headers['set-cookie'])
+      .expect(HttpStatus.OK_200)
+
+    // Запрашиваем список девайсов с обновленным токеном. Количество девайсов и deviceId  всех девайсов не должны измениться. LastActiveDate девайса 1 должна измениться
+    const updatedDevices = await request(app)
+      .get(`${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}`)
+      .set('Cookie', updatedRefreshToken.headers['set-cookie'])
+
+    expect(updatedDevices.body.length).toBe(userAgents.length)
+    expect(updatedDevices.body[0].deviceId).toBe(devices.body[0].deviceId)
+
+    const targetTitle = userAgents[0]
+
+    const before = devices.body.find(
+      (d: { title: string }) => d.title === targetTitle
+    )
+    const after = updatedDevices.body.find(
+      (d: { title: string }) => d.title === targetTitle
+    )
+
+    expect(after.lastActiveDate).not.toBe(before.lastActiveDate)
+
+    // Удаляем девайс 2 (передаем refreshToken девайса 1). Запрашиваем список девайсов. Проверяем, что девайс 2 отсутствует в списке;
+    const deviceToDelete = updatedDevices.body.find(
+      (d: { title: string }) => d.title === userAgents[1]
+    )
+
+    await request(app)
+      .delete(
+        `${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}/${deviceToDelete.deviceId}`
+      )
+      .set('Cookie', updatedRefreshToken.headers['set-cookie'])
+      .expect(HttpStatus.NO_CONTENT_204)
+
+    const devicesAfterDelete = await request(app)
+      .get(`${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}`)
+      .set('Cookie', updatedRefreshToken.headers['set-cookie'])
+
+    expect(devicesAfterDelete.body.length).toBe(userAgents.length - 1)
+    expect(
+      devicesAfterDelete.body.find(
+        (d: { title: string }) => d.title === userAgents[1]
+      )
+    ).toBeUndefined()
+  })
+
+  it('after logout should reduce number of sessions by 1', async () => {
+    
   })
 })
