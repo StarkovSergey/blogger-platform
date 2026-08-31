@@ -7,4 +7,5 @@ export const PATHS = {
   comments: `${API}/comments`,
   users: `${API}/users`,
   auth: `${API}/auth`,
+  security: `${API}/security`,
 } as const

@@ -7,6 +7,7 @@ import { usersRouter } from './features/users/router/users.router.js'
 import { authRouter } from './features/auth/router/auth.router.js'
 import { commentsRouter } from './features/comments/router/comments.router.js'
 import cookieParser from 'cookie-parser'
+import { securityRouter } from './features/security/router/security.router.js'
 
 export const setupApp = (app: Express) => {
   app.use(express.json())
@@ -22,6 +23,7 @@ export const setupApp = (app: Express) => {
   app.use(PATHS.users, usersRouter)
   app.use(PATHS.comments, commentsRouter)
   app.use(PATHS.testing, testsRouter)
+  app.use(PATHS.security, securityRouter)
 
   return app
 }

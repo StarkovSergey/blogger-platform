@@ -12,6 +12,11 @@ export const sessionsRepository = {
       deviceId,
     })
   },
+  async findSessionByDeviceId(deviceId: string) {
+    return sessionsCollection.findOne({
+      deviceId,
+    })
+  },
   async findAllSessions() {
     return sessionsCollection.find().toArray()
   },
@@ -43,5 +48,13 @@ export const sessionsRepository = {
     })
 
     return result.deletedCount > 0
+  },
+  async deleteAllOtherSessions(currentDeviceId: string, userId: string) {
+    const result = await sessionsCollection.deleteMany({
+      userId,
+      deviceId: { $ne: currentDeviceId },
+    })
+
+    return result.deletedCount
   },
 }
