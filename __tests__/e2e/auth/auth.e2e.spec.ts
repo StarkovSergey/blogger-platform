@@ -84,27 +84,8 @@ describe('Users API', () => {
   })
 
   it('should create 4 sessions for the same user with different user-agents', async () => {
-    await usersTestClient.createUser(app, VALID_USER_INPUT)
-    const credentials: LoginInputModel = {
-      loginOrEmail: VALID_USER_INPUT.login,
-      password: VALID_USER_INPUT.password,
-    }
-    const userAgents = [
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15',
-      'Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0',
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Mobile/15E148',
-    ]
-    const loginResponses = await Promise.all(
-      userAgents.map((ua) => authTestClient.login(app, credentials, ua))
-    )
-    for (const res of loginResponses) {
-      expect(res.body.accessToken).toBeDefined()
-      expect(res.headers['set-cookie'][0]).toContain(REFRESH_TOKEN_COOKIE_KEY)
-    }
-
-    const databaseSessions = await sessionsRepository.findAllSessions()
-    expect(databaseSessions.length).toBe(userAgents.length)
+    const { loginResponses, userAgents } =
+      await authTestClient.createNewUserWithFourSession(app, VALID_USER_INPUT)
 
     const devices = await request(app)
       .get(`${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}`)
@@ -164,6 +145,37 @@ describe('Users API', () => {
   })
 
   it('after logout should reduce number of sessions by 1', async () => {
-    
+    const { loginResponses, userAgents } =
+      await authTestClient.createNewUserWithFourSession(app, VALID_USER_INPUT)
+
+    await request(app)
+      .post(`${PATHS.auth}${AUTH_ROUTER_PATHS.LOGOUT}`)
+      .set('Cookie', loginResponses[0].headers['set-cookie'])
+      .expect(HttpStatus.NO_CONTENT_204)
+
+    const devices = await request(app)
+      .get(`${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}`)
+      .set('Cookie', loginResponses[1].headers['set-cookie'])
+      .expect(HttpStatus.OK_200)
+
+    expect(devices.body.length).toBe(userAgents.length - 1)
+  })
+
+  it('should remove all other sessions except the current one', async () => {
+    const { loginResponses, userAgents } =
+      await authTestClient.createNewUserWithFourSession(app, VALID_USER_INPUT)
+
+    await request(app)
+      .delete(`${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}`)
+      .set('Cookie', loginResponses[0].headers['set-cookie'])
+      .expect(HttpStatus.NO_CONTENT_204)
+
+    const devices = await request(app)
+      .get(`${PATHS.security}${SECURITY_ROUTER_PATHS.DEVICES}`)
+      .set('Cookie', loginResponses[0].headers['set-cookie'])
+      .expect(HttpStatus.OK_200)
+
+    expect(devices.body.length).toBe(1)
+    expect(devices.body[0].title).toBe(userAgents[0])
   })
 })

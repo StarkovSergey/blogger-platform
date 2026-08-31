@@ -7,6 +7,9 @@ import { UserInputModel } from '../../../src/features/users/types/input/UserInpu
 import { expect, vi } from 'vitest'
 import { emailService } from '../../../src/core/adapters/email.service.js'
 import { LoginInputModel } from '../../../src/features/auth/types/input/login-input-model.js'
+import { VALID_USER_INPUT } from './users-test-client.js'
+import { REFRESH_TOKEN_COOKIE_KEY } from '../../../src/features/auth/utils/constants.js'
+import { sessionsRepository } from '../../../src/features/auth/repositories/sessions.repository.js'
 
 export const authTestClient = {
   async registration(app: Express, user: UserInputModel) {
@@ -32,5 +35,30 @@ export const authTestClient = {
 
     return response
   },
-  async createNewUserWithFourSession() {},
+  async createNewUserWithFourSession(app: Express, user: UserInputModel) {
+    await this.registration(app, user)
+
+    const credentials: LoginInputModel = {
+      loginOrEmail: user.login,
+      password: user.password,
+    }
+    const userAgents = [
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15',
+      'Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Mobile/15E148',
+    ]
+    const loginResponses = await Promise.all(
+      userAgents.map((ua) => authTestClient.login(app, credentials, ua))
+    )
+    for (const res of loginResponses) {
+      expect(res.body.accessToken).toBeDefined()
+      expect(res.headers['set-cookie'][0]).toContain(REFRESH_TOKEN_COOKIE_KEY)
+    }
+
+    const databaseSessions = await sessionsRepository.findAllSessions()
+    expect(databaseSessions.length).toBe(userAgents.length)
+
+    return { loginResponses, userAgents }
+  },
 }
