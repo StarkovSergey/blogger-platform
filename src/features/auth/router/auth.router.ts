@@ -13,6 +13,7 @@ import { registrationEmailResendingHandler } from './handlers/registration-email
 import { refreshTokenGuard } from '../../../core/middleware/validation/refresh-token-guard.middleware.js'
 import { refreshTokenHandler } from './handlers/refresh-token.handler.js'
 import { logoutHandler } from './handlers/logout.handler.js'
+import { rateLimitMiddleware } from '../../../core/middleware/validation/rate-limit.middleware.js'
 
 export const AUTH_ROUTER_PATHS = {
   ROOT: '',
@@ -29,6 +30,7 @@ export const authRouter = Router()
 
 authRouter.post(
   AUTH_ROUTER_PATHS.LOGIN,
+  rateLimitMiddleware,
   createLoginInputModelValidation(),
   inputValidationResultMiddleware,
   loginHandler
@@ -38,6 +40,7 @@ authRouter.get(AUTH_ROUTER_PATHS.ME, accessTokenGuard, meHandler)
 
 authRouter.post(
   AUTH_ROUTER_PATHS.REGISTRATION,
+  rateLimitMiddleware,
   createUserInputModelValidationChain(),
   inputValidationResultMiddleware,
   registrationHandler
@@ -45,6 +48,7 @@ authRouter.post(
 
 authRouter.post(
   AUTH_ROUTER_PATHS.REGISTRATION_CONFIRMATION,
+  rateLimitMiddleware,
   confirmationCodeValidation,
   inputValidationResultMiddleware,
   registrationConfirmationHandler
@@ -52,6 +56,7 @@ authRouter.post(
 
 authRouter.post(
   AUTH_ROUTER_PATHS.REGISTRATION_EMAIL_RESENDING,
+  rateLimitMiddleware,
   createEmailResendingInputModelValidationChain(),
   inputValidationResultMiddleware,
   registrationEmailResendingHandler

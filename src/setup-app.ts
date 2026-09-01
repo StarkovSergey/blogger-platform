@@ -12,6 +12,7 @@ import { securityRouter } from './features/security/router/security.router.js'
 export const setupApp = (app: Express) => {
   app.use(express.json())
   app.use(cookieParser())
+  app.set('trust proxy', true)
 
   app.get('/', (req, res) => {
     res.status(200).send('Hello world')

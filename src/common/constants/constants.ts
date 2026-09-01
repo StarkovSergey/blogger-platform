@@ -8,6 +8,7 @@ export const HttpStatus = {
   FORBIDDEN_403: 403,
   NOT_FOUND_404: 404,
   CONFLICT_409: 409,
+  TOO_MANY_REQUESTS_429: 429,
 
   INTERNAL_SERVER_ERROR_500: 500,
 } as const

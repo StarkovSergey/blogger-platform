@@ -15,7 +15,6 @@ import { HttpStatus } from '../../../src/common/constants/constants.js'
 import { AUTH_ROUTER_PATHS } from '../../../src/features/auth/router/auth.router.js'
 import { REFRESH_TOKEN_COOKIE_KEY } from '../../../src/features/auth/utils/constants.js'
 import { authTestClient } from '../../utils/test-clients/auth-test-client.js'
-import { sessionsRepository } from '../../../src/features/auth/repositories/sessions.repository.js'
 import { SECURITY_ROUTER_PATHS } from '../../../src/features/security/router/security.router.js'
 
 describe('Users API', () => {
