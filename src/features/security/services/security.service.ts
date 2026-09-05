@@ -2,16 +2,27 @@ import {
   jwtSecondsToDate,
   RefreshTokenPayload,
 } from '../../../core/adapters/jwt.service.js'
-import { sessionsQueryRepository } from '../../auth/repositories/sessions.query.repository.js'
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { DeviceViewModel } from '../types/output/DeviceViewModel.js'
-import { sessionsRepository } from '../../auth/repositories/sessions.repository.js'
+import { SessionsQueryRepository } from '../../auth/repositories/sessions.query.repository.js'
+import { SessionsRepository } from '../../auth/repositories/sessions.repository.js'
 
-export const securityService = {
+export class SecurityService {
+  sessionsRepository: SessionsRepository
+  sessionsQueryRepository: SessionsQueryRepository
+
+  constructor(
+    sessionsRepository: SessionsRepository,
+    sessionsQueryRepository: SessionsQueryRepository
+  ) {
+    this.sessionsRepository = sessionsRepository
+    this.sessionsQueryRepository = sessionsQueryRepository
+  }
+
   async getAllActiveSessions(
     refreshTokenPayload: RefreshTokenPayload
   ): Promise<Result<DeviceViewModel[]>> {
-    const res = await sessionsQueryRepository.findManyByUserId(
+    const res = await this.sessionsQueryRepository.findManyByUserId(
       refreshTokenPayload.userId
     )
 
@@ -20,12 +31,14 @@ export const securityService = {
       data: res,
       extensions: [],
     }
-  },
+  }
+
   async deleteSession(
     deviceId: string,
     currentUserId: string
   ): Promise<Result> {
-    const session = await sessionsRepository.findSessionByDeviceId(deviceId)
+    const session =
+      await this.sessionsRepository.findSessionByDeviceId(deviceId)
 
     if (!session) {
       return {
@@ -45,7 +58,7 @@ export const securityService = {
       }
     }
 
-    const isSuccessDelete = await sessionsRepository.deleteSession(
+    const isSuccessDelete = await this.sessionsRepository.deleteSession(
       deviceId,
       session.iat
     )
@@ -64,13 +77,14 @@ export const securityService = {
       errorMessage: 'Some error',
       data: null,
     }
-  },
+  }
+
   async deleteAllOtherSessions(
     deviceId: string,
     currentUserId: string,
     iat: number
   ): Promise<Result> {
-    const session = await sessionsRepository.findSession(
+    const session = await this.sessionsRepository.findSession(
       jwtSecondsToDate(iat),
       deviceId
     )
@@ -93,12 +107,15 @@ export const securityService = {
       }
     }
 
-    await sessionsRepository.deleteAllOtherSessions(deviceId, currentUserId)
+    await this.sessionsRepository.deleteAllOtherSessions(
+      deviceId,
+      currentUserId
+    )
 
     return {
       status: ResultStatus.Success,
       data: null,
       extensions: [],
     }
-  },
+  }
 }

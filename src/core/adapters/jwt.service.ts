@@ -10,19 +10,21 @@ export type RefreshTokenPayload = {
 
 export type AccessTokenPayload = Omit<RefreshTokenPayload, 'deviceId'>
 
-export const jwtService = {
+export class JwtService {
   async createJWT(userId: string) {
     return jwt.sign({ userId }, SETTINGS.JWT_SECRET, {
       expiresIn:
         `${SETTINGS.JWT_TOKEN_EXP_TIME_SECONDS}s` as SignOptions['expiresIn'],
     })
-  },
+  }
+
   async createRefreshJWT(userId: string, deviceId: string) {
     return jwt.sign({ userId, deviceId }, SETTINGS.JWT_REFRESH_SECRET, {
       expiresIn:
         `${SETTINGS.JWT_REFRESH_TOKEN_EXP_TIME_SECONDS}s` as SignOptions['expiresIn'],
     })
-  },
+  }
+
   async verifyAccessToken(token: string) {
     try {
       const payload = jwt.verify(token, SETTINGS.JWT_SECRET)
@@ -36,7 +38,8 @@ export const jwtService = {
       console.error('Token verify some error')
       return null
     }
-  },
+  }
+
   async verifyRefreshToken(token: string): Promise<RefreshTokenPayload | null> {
     try {
       const payload = jwt.verify(token, SETTINGS.JWT_REFRESH_SECRET)
@@ -50,7 +53,8 @@ export const jwtService = {
       console.error('Token verify some error')
       return null
     }
-  },
+  }
+
   decodeToken(token: string): RefreshTokenPayload {
     const payload = jwt.decode(token)
 
@@ -62,7 +66,7 @@ export const jwtService = {
       throw new Error('Failed to decode refresh token')
     }
     return payload
-  },
+  }
 }
 
 export function jwtSecondsToDate(seconds: number) {

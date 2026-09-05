@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
-import { jwtService } from '../../adapters/jwt.service.js'
 import { HttpStatus } from '../../../common/constants/constants.js'
 import { REFRESH_TOKEN_COOKIE_KEY } from '../../../features/auth/utils/constants.js'
-import { authService } from '../../../features/auth/services/auth.service.js'
+import { authService, jwtService } from '../../../composition-root.js'
 
 export const refreshTokenGuard = async (
   req: Request,

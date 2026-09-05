@@ -1,13 +1,24 @@
 import { UserInputModel } from '../types/input/UserInputModel.js'
 import { UserDB } from '../types/userDB.js'
-import { usersRepository } from '../repositories/users.repository.js'
 import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { UserErrorCode } from '../types/user-error-code.js'
-import { passwordHashService } from '../../../core/adapters/password-hash.service.js'
+import { UsersRepository } from '../repositories/users.repository.js'
+import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
 
-export const usersService = {
+export class UsersService {
+  usersRepository: UsersRepository
+  passwordHashService: PasswordHashService
+
+  constructor(
+    usersRepository: UsersRepository,
+    passwordHashService: PasswordHashService
+  ) {
+    this.usersRepository = usersRepository
+    this.passwordHashService = passwordHashService
+  }
+
   async create(userDto: UserInputModel): Promise<string> {
-    const byLogin = await usersRepository.findByLogin(userDto.login)
+    const byLogin = await this.usersRepository.findByLogin(userDto.login)
     if (byLogin) {
       throw new DomainException(
         'login already exists',
@@ -16,7 +27,7 @@ export const usersService = {
       )
     }
 
-    const byEmail = await usersRepository.findByEmail(userDto.email)
+    const byEmail = await this.usersRepository.findByEmail(userDto.email)
     if (byEmail) {
       throw new DomainException(
         'email already exists',
@@ -25,7 +36,7 @@ export const usersService = {
       )
     }
 
-    const hash = await passwordHashService.generateHash(userDto.password)
+    const hash = await this.passwordHashService.generateHash(userDto.password)
     const newUser: UserDB = {
       login: userDto.login,
       email: userDto.email,
@@ -38,9 +49,10 @@ export const usersService = {
       },
     }
 
-    return await usersRepository.create(newUser)
-  },
+    return await this.usersRepository.create(newUser)
+  }
+
   async delete(id: string) {
-    await usersRepository.delete(id)
-  },
+    await this.usersRepository.delete(id)
+  }
 }

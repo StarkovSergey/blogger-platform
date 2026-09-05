@@ -3,10 +3,10 @@ import {
   RequestWithBody,
 } from '../../../../core/types/utils-types.js'
 import { RegistrationInputModel } from '../../types/input/registration-input-model.js'
-import { authService } from '../../services/auth.service.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
+import { authService } from '../../../../composition-root.js'
 
 export async function registrationHandler(
   req: RequestWithBody<RegistrationInputModel>,

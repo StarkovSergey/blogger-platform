@@ -3,8 +3,8 @@ import type {
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
 import { CommentViewModel } from '../../types/output/CommentViewModel.js'
-import { commentsQueryRepository } from '../../repositories/comments.query.repository.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
+import { commentsQueryRepository } from '../../../../composition-root.js'
 
 export async function getCommentHandler(
   req: RequestWithParams<{ id: string }>,

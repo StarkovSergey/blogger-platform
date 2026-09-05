@@ -3,8 +3,8 @@ import { UserQueryInput } from '../../types/input/user-query-input.js'
 import { RequestWithQuery } from '../../../../core/types/utils-types.js'
 import { Pagination } from '../../../../core/types/paginated-output.js'
 import { UserViewModel } from '../../types/output/UserViewModel.js'
-import { usersQueryRepository } from '../../repositories/users.query.repository.js'
 import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
+import { usersQueryRepository } from '../../../../composition-root.js'
 
 export const getUserListHandler = async (
   req: RequestWithQuery<UserQueryInput>,

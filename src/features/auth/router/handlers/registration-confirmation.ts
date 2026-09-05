@@ -2,11 +2,11 @@ import {
   ApiResponse,
   RequestWithBody,
 } from '../../../../core/types/utils-types.js'
-import { authService } from '../../services/auth.service.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { RegistrationConfirmationCodeModel } from '../../types/input/registration-confirmation-code-model.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
+import { authService } from '../../../../composition-root.js'
 
 export async function registrationConfirmationHandler(
   req: RequestWithBody<RegistrationConfirmationCodeModel>,

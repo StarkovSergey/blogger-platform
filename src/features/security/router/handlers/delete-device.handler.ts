@@ -2,10 +2,10 @@ import {
   ApiResponse,
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
-import { securityService } from '../../services/security.service.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
+import { securityService } from '../../../../composition-root.js'
 
 export async function deleteDeviceSessionHandler(
   req: RequestWithParams<{ deviceId: string }>,
@@ -21,7 +21,7 @@ export async function deleteDeviceSessionHandler(
     const deviceId = req.params.deviceId
     const result = await securityService.deleteSession(
       deviceId,
-      refreshPayload.userId,
+      refreshPayload.userId
     )
 
     if (result.status !== ResultStatus.Success) {

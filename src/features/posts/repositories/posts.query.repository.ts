@@ -6,7 +6,7 @@ import { PostViewModel } from '../types/output/PostViewModel.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 
-export const postsQueryRepository = {
+export class PostsQueryRepository {
   async findMany(queryDto: PostQueryInput): Promise<Pagination<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto
 
@@ -29,7 +29,8 @@ export const postsQueryRepository = {
       page: pageNumber,
       pagesCount: Math.ceil(totalCount / pageSize),
     }
-  },
+  }
+
   async findByIdOrFailed(id: string): Promise<PostViewModel> {
     const res = await postsCollection.findOne({ _id: new ObjectId(id) })
 
@@ -38,7 +39,8 @@ export const postsQueryRepository = {
     }
 
     return this._mapToPostViewModel(res)
-  },
+  }
+
   async findPostsByBlog(
     blogId: string,
     queryDto: PostQueryInput
@@ -65,7 +67,8 @@ export const postsQueryRepository = {
       page: pageNumber,
       pagesCount: Math.ceil(totalCount / pageSize),
     }
-  },
+  }
+
   _mapToPostViewModel(post: WithId<PostDB>): PostViewModel {
     return {
       id: post._id.toString(),
@@ -76,5 +79,5 @@ export const postsQueryRepository = {
       blogName: post.blogName,
       createdAt: post.createdAt.toISOString(),
     }
-  },
+  }
 }

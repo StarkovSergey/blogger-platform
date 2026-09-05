@@ -4,7 +4,7 @@ import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
 import { RequestWithQuery } from '../../../../core/types/utils-types.js'
 import { PostQueryInput } from '../../types/input/post-query-input.js'
 import { PaginatedOutput } from '../../../../core/types/paginated-output.js'
-import { postsQueryRepository } from '../../repositories/posts.query.repository.js'
+import { postsQueryRepository } from '../../../../composition-root.js'
 
 export const getPostListHandler = async (
   req: RequestWithQuery<PostQueryInput>,

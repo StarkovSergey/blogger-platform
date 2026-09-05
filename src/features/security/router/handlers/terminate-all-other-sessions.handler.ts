@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { securityService } from '../../services/security.service.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
+import { securityService } from '../../../../composition-root.js'
 
 export async function terminateAllOtherSessionsHandler(
   req: Request,

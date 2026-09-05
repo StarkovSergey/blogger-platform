@@ -7,7 +7,7 @@ import { NotFoundException } from '../../../core/exceptions/not-found.exception.
 import { BlogViewModel } from '../types/output/BlogViewModel.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 
-export const blogsQueryRepository = {
+export class BlogsQueryRepository {
   async findMany(queryDto: BlogQueryInput): Promise<Pagination<BlogViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
       queryDto
@@ -36,10 +36,12 @@ export const blogsQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       page: pageNumber,
     }
-  },
+  }
+
   async findById(id: string): Promise<WithId<BlogDB> | null> {
     return blogsCollection.findOne({ _id: new ObjectId(id) })
-  },
+  }
+
   async findByIdOrFail(id: string): Promise<BlogViewModel> {
     const res = await blogsCollection.findOne({ _id: new ObjectId(id) })
 
@@ -48,7 +50,8 @@ export const blogsQueryRepository = {
     }
 
     return this._mapToBlogListViewModel(res)
-  },
+  }
+
   _mapToBlogListViewModel(blog: WithId<BlogDB>): BlogViewModel {
     return {
       id: blog._id.toString(),
@@ -58,5 +61,5 @@ export const blogsQueryRepository = {
       createdAt: blog.createdAt.toISOString(),
       isMembership: blog.isMembership,
     }
-  },
+  }
 }

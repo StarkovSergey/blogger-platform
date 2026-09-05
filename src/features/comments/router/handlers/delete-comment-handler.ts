@@ -3,9 +3,9 @@ import {
   RequestWithParams,
 } from '../../../../core/types/utils-types.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
-import { commentsService } from '../../services/comments.service.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
+import { commentsService } from '../../../../composition-root.js'
 
 export async function deleteCommentHandler(
   req: RequestWithParams<{ id: string }>,

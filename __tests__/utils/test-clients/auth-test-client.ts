@@ -5,11 +5,13 @@ import { PATHS } from '../../../src/core/paths/paths.js'
 import { AUTH_ROUTER_PATHS } from '../../../src/features/auth/router/auth.router.js'
 import { UserInputModel } from '../../../src/features/users/types/input/UserInputModel.js'
 import { expect, vi } from 'vitest'
-import { emailService } from '../../../src/core/adapters/email.service.js'
 import { LoginInputModel } from '../../../src/features/auth/types/input/login-input-model.js'
 import { VALID_USER_INPUT } from './users-test-client.js'
 import { REFRESH_TOKEN_COOKIE_KEY } from '../../../src/features/auth/utils/constants.js'
-import { sessionsRepository } from '../../../src/features/auth/repositories/sessions.repository.js'
+import {
+  emailService,
+  sessionsRepository,
+} from '../../../src/composition-root.js'
 
 export const authTestClient = {
   async registration(app: Express, user: UserInputModel) {

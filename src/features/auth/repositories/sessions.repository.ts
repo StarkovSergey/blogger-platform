@@ -1,25 +1,25 @@
 import { SessionDB } from '../types/sessionDB.js'
 import { sessionsCollection } from '../../../db/collections.js'
 
-export const sessionsRepository = {
+export class SessionsRepository {
   async addSession(session: SessionDB) {
     const insertResult = await sessionsCollection.insertOne(session)
     return Boolean(insertResult.insertedId)
-  },
+  }
   async findSession(iat: Date, deviceId: string) {
     return sessionsCollection.findOne({
       iat,
       deviceId,
     })
-  },
+  }
   async findSessionByDeviceId(deviceId: string) {
     return sessionsCollection.findOne({
       deviceId,
     })
-  },
+  }
   async findAllSessions() {
     return sessionsCollection.find().toArray()
-  },
+  }
   async updateSession(
     deviceId: string,
     currentIat: Date,
@@ -40,7 +40,7 @@ export const sessionsRepository = {
     )
 
     return updateResult.matchedCount === 1
-  },
+  }
   async deleteSession(deviceId: string, iat: Date) {
     const result = await sessionsCollection.deleteOne({
       deviceId,
@@ -48,7 +48,7 @@ export const sessionsRepository = {
     })
 
     return result.deletedCount > 0
-  },
+  }
   async deleteAllOtherSessions(currentDeviceId: string, userId: string) {
     const result = await sessionsCollection.deleteMany({
       userId,
@@ -56,5 +56,5 @@ export const sessionsRepository = {
     })
 
     return result.deletedCount
-  },
+  }
 }

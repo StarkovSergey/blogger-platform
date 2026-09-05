@@ -4,7 +4,7 @@ import type {
 } from '../../../../core/types/utils-types.js'
 import type { BlogViewModel } from '../../types/output/BlogViewModel.js'
 import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
-import { blogsQueryRepository } from '../../repositories/blogs.query.repository.js'
+import { blogsQueryRepository } from '../../../../composition-root.js'
 
 export async function getBlogHandler(
   req: RequestWithParams<{ id: string }>,

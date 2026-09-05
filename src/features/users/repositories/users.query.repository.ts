@@ -7,7 +7,7 @@ import { ObjectId, WithId } from 'mongodb'
 import { UserDB } from '../types/userDB.js'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 
-export const usersQueryRepository = {
+export class UsersQueryRepository {
   async findMany(queryDto: UserQueryInput): Promise<Pagination<UserViewModel>> {
     const {
       pageNumber,
@@ -54,12 +54,14 @@ export const usersQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       page: pageNumber,
     }
-  },
+  }
+
   async findById(id: string): Promise<UserViewModel | null> {
     const user = await usersCollection.findOne({ _id: new ObjectId(id) })
 
     return user ? this._mapToUserListViewModel(user) : null
-  },
+  }
+
   async findByIdOrFail(id: string): Promise<UserViewModel> {
     const res = await usersCollection.findOne({ _id: new ObjectId(id) })
 
@@ -68,7 +70,8 @@ export const usersQueryRepository = {
     }
 
     return this._mapToUserListViewModel(res)
-  },
+  }
+
   _mapToUserListViewModel(user: WithId<UserDB>): UserViewModel {
     return {
       id: user._id.toString(),
@@ -76,5 +79,5 @@ export const usersQueryRepository = {
       email: user.email,
       createdAt: user.createdAt.toISOString(),
     }
-  },
+  }
 }

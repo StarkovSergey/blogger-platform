@@ -1,28 +1,48 @@
 import { LoginInputModel } from '../types/input/login-input-model.js'
-import { usersRepository } from '../../users/repositories/users.repository.js'
-import { passwordHashService } from '../../../core/adapters/password-hash.service.js'
 import {
   jwtSecondsToDate,
-  jwtService,
+  JwtService,
   RefreshTokenPayload,
 } from '../../../core/adapters/jwt.service.js'
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { LoginSuccessViewModel } from '../types/output/LoginSuccessViewModel.js'
 import { RegistrationInputModel } from '../types/input/registration-input-model.js'
 import { EmailConfirmation, User } from '../../users/services/user.entity.js'
-import { emailService } from '../../../core/adapters/email.service.js'
 import { emailManager } from '../../../core/constants/managers/email-manager.js'
 import { randomUUID } from 'node:crypto'
 import { SessionDB } from '../types/sessionDB.js'
-import { sessionsRepository } from '../repositories/sessions.repository.js'
+import { SessionsRepository } from '../repositories/sessions.repository.js'
+import { UsersRepository } from '../../users/repositories/users.repository.js'
+import { EmailService } from '../../../core/adapters/email.service.js'
+import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
 
-export const authService = {
+export class AuthService {
+  sessionsRepository: SessionsRepository
+  usersRepository: UsersRepository
+  emailService: EmailService
+  jwtService: JwtService
+  passwordHashService: PasswordHashService
+
+  constructor(
+    sessionsRepository: SessionsRepository,
+    usersRepository: UsersRepository,
+    emailService: EmailService,
+    jwtService: JwtService,
+    passwordHashService: PasswordHashService
+  ) {
+    this.sessionsRepository = sessionsRepository
+    this.usersRepository = usersRepository
+    this.emailService = emailService
+    this.jwtService = jwtService
+    this.passwordHashService = passwordHashService
+  }
+
   async registerUser({
     login,
     email,
     password,
   }: RegistrationInputModel): Promise<Result> {
-    const isEmailExists = await usersRepository.findByEmail(email)
+    const isEmailExists = await this.usersRepository.findByEmail(email)
 
     if (isEmailExists) {
       return {
@@ -33,7 +53,7 @@ export const authService = {
       }
     }
 
-    const isLoginExists = await usersRepository.findByLogin(login)
+    const isLoginExists = await this.usersRepository.findByLogin(login)
 
     if (isLoginExists) {
       return {
@@ -44,12 +64,12 @@ export const authService = {
       }
     }
 
-    const passwordHash = await passwordHashService.generateHash(password)
+    const passwordHash = await this.passwordHashService.generateHash(password)
     const newUser = new User(login, email, passwordHash)
 
-    await usersRepository.create(newUser)
+    await this.usersRepository.create(newUser)
 
-    emailService
+    this.emailService
       .sendEmail({
         to: newUser.email,
         subject: emailManager.registration.subject,
@@ -67,15 +87,18 @@ export const authService = {
       data: null,
       extensions: [],
     }
-  },
+  }
+
   async login(
     loginDto: LoginInputModel,
     meta: { ip: string; deviceName: string }
   ): Promise<Result<LoginSuccessViewModel & { refreshToken: string }>> {
-    const user = await usersRepository.findByLoginOrEmail(loginDto.loginOrEmail)
+    const user = await this.usersRepository.findByLoginOrEmail(
+      loginDto.loginOrEmail
+    )
 
     const isCorrectCredentials = user
-      ? await passwordHashService.checkPassword(
+      ? await this.passwordHashService.checkPassword(
           loginDto.password,
           user.passwordHash
         )
@@ -92,10 +115,13 @@ export const authService = {
 
     const userId = user._id.toString()
     const deviceId = crypto.randomUUID()
-    const accessToken = await jwtService.createJWT(userId)
-    const refreshToken = await jwtService.createRefreshJWT(userId, deviceId)
+    const accessToken = await this.jwtService.createJWT(userId)
+    const refreshToken = await this.jwtService.createRefreshJWT(
+      userId,
+      deviceId
+    )
 
-    const refreshTokenPayload = jwtService.decodeToken(refreshToken)
+    const refreshTokenPayload = this.jwtService.decodeToken(refreshToken)
 
     const session: SessionDB = {
       userId,
@@ -106,16 +132,17 @@ export const authService = {
       ip: meta.ip,
     }
 
-    await sessionsRepository.addSession(session)
+    await this.sessionsRepository.addSession(session)
 
     return {
       status: ResultStatus.Success,
       data: { accessToken, refreshToken },
       extensions: [],
     }
-  },
+  }
+
   async confirmEmail(code: string): Promise<Result> {
-    const user = await usersRepository.findUserByConfirmationCode(code)
+    const user = await this.usersRepository.findUserByConfirmationCode(code)
 
     const isInvalidCode =
       !user ||
@@ -131,7 +158,7 @@ export const authService = {
       }
     }
 
-    const isUpdated = await usersRepository.updateConfirmation(user._id)
+    const isUpdated = await this.usersRepository.updateConfirmation(user._id)
 
     if (!isUpdated) {
       return {
@@ -147,12 +174,13 @@ export const authService = {
       data: null,
       extensions: [],
     }
-  },
+  }
+
   async emailResending(email: string): Promise<Result> {
     // 1. Проверить, что пользователь с таким email существует
     // 2. Обновить у пользователя confirmation code и сопутствующие поля
     // 3. Отправить новый email
-    const user = await usersRepository.findByEmail(email)
+    const user = await this.usersRepository.findByEmail(email)
 
     if (!user || user.emailConfirmation.isConfirmed) {
       return {
@@ -171,7 +199,7 @@ export const authService = {
       isConfirmed: false,
     }
 
-    const isUpdated = await usersRepository.updateEmailConfirmation(
+    const isUpdated = await this.usersRepository.updateEmailConfirmation(
       user._id,
       emailConfirmation
     )
@@ -187,7 +215,7 @@ export const authService = {
       }
     }
 
-    emailService
+    this.emailService
       .sendEmail({
         to: user.email,
         subject: emailManager.registration.subject,
@@ -205,29 +233,33 @@ export const authService = {
       data: null,
       extensions: [],
     }
-  },
+  }
+
   async isSessionExist(iat: number, deviceId: string): Promise<boolean> {
-    const res = await sessionsRepository.findSession(
+    const res = await this.sessionsRepository.findSession(
       jwtSecondsToDate(iat),
       deviceId
     )
 
     return Boolean(res)
-  },
+  }
+
   async createNewTokensAndUpdateSession(
     refreshTokenPayload: RefreshTokenPayload,
     ip: string
   ): Promise<Result<{ accessToken: string; newRefreshToken: string }>> {
-    const accessToken = await jwtService.createJWT(refreshTokenPayload.userId)
-    const newRefreshToken = await jwtService.createRefreshJWT(
+    const accessToken = await this.jwtService.createJWT(
+      refreshTokenPayload.userId
+    )
+    const newRefreshToken = await this.jwtService.createRefreshJWT(
       refreshTokenPayload.userId,
       refreshTokenPayload.deviceId
     )
 
-    const newPayload = jwtService.decodeToken(newRefreshToken)
+    const newPayload = this.jwtService.decodeToken(newRefreshToken)
 
     // update session
-    const isUpdated = await sessionsRepository.updateSession(
+    const isUpdated = await this.sessionsRepository.updateSession(
       refreshTokenPayload.deviceId,
       jwtSecondsToDate(refreshTokenPayload.iat),
       {
@@ -251,9 +283,10 @@ export const authService = {
       data: { accessToken, newRefreshToken },
       extensions: [],
     }
-  },
+  }
+
   async logout(refreshTokenPayload: RefreshTokenPayload): Promise<Result> {
-    const isSuccessDeleted = await sessionsRepository.deleteSession(
+    const isSuccessDeleted = await this.sessionsRepository.deleteSession(
       refreshTokenPayload.deviceId,
       jwtSecondsToDate(refreshTokenPayload.iat)
     )
@@ -272,5 +305,5 @@ export const authService = {
       errorMessage: 'Some error',
       data: null,
     }
-  },
+  }
 }

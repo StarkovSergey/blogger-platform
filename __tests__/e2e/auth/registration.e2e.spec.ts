@@ -1,11 +1,4 @@
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it
-} from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import express from 'express'
 import { setupApp } from '../../../src/setup-app.js'
 import { runDB, stopDb } from '../../../src/db/mongo.db.js'
@@ -14,8 +7,8 @@ import { clearDb } from '../../utils/clear-db.js'
 import request from 'supertest'
 import { PATHS } from '../../../src/core/paths/paths.js'
 import { AUTH_ROUTER_PATHS } from '../../../src/features/auth/router/auth.router.js'
-import { usersRepository } from '../../../src/features/users/repositories/users.repository.js'
 import { authTestClient } from '../../utils/test-clients/auth-test-client.js'
+import { usersRepository } from '../../../src/composition-root.js'
 
 describe('Registration API', () => {
   const app = express()

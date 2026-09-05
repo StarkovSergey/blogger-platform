@@ -4,7 +4,7 @@ import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
 import { RequestWithQuery } from '../../../../core/types/utils-types.js'
 import { BlogQueryInput } from '../../types/input/blog-query-input.js'
 import { Pagination } from '../../../../core/types/paginated-output.js'
-import { blogsQueryRepository } from '../../repositories/blogs.query.repository.js'
+import { blogsQueryRepository } from '../../../../composition-root.js'
 
 export const getBlogListHandler = async (
   req: RequestWithQuery<BlogQueryInput>,

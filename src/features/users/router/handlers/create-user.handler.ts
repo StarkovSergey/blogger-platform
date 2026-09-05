@@ -3,9 +3,11 @@ import { RequestWithBody } from '../../../../core/types/utils-types.js'
 import { UserInputModel } from '../../types/input/UserInputModel.js'
 import { UserViewModel } from '../../types/output/UserViewModel.js'
 import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
-import { usersService } from '../../services/users.service.js'
-import { usersQueryRepository } from '../../repositories/users.query.repository.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
+import {
+  usersQueryRepository,
+  usersService,
+} from '../../../../composition-root.js'
 
 export async function createUserHandler(
   req: RequestWithBody<UserInputModel>,

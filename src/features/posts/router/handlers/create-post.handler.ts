@@ -5,9 +5,11 @@ import type {
 import { PostInputModel } from '../../types/input/PostInputModel.js'
 import { PostViewModel } from '../../types/output/PostViewModel.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
-import { postsService } from '../../services/posts.service.js'
 import { errorsHandlers } from '../../../../core/exceptions/errors-handlers.js'
-import { postsQueryRepository } from '../../repositories/posts.query.repository.js'
+import {
+  postsQueryRepository,
+  postsService,
+} from '../../../../composition-root.js'
 
 export const createPostHandler = async (
   req: RequestWithBody<PostInputModel>,

@@ -4,8 +4,10 @@ import { PostViewModel } from '../../../posts/types/output/PostViewModel.js'
 import { PostQueryInput } from '../../../posts/types/input/post-query-input.js'
 import { Response } from 'express'
 import { Pagination } from '../../../../core/types/paginated-output.js'
-import { postsQueryRepository } from '../../../posts/repositories/posts.query.repository.js'
-import { blogsQueryRepository } from '../../repositories/blogs.query.repository.js'
+import {
+  blogsQueryRepository,
+  postsQueryRepository,
+} from '../../../../composition-root.js'
 
 export async function getBlogPostsHandler(
   req: RequestWithParamsAndQuery<{ id: string }, PostQueryInput>,

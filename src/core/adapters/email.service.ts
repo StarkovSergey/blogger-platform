@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 import { SETTINGS } from '../../settings/config.js'
 
-export const emailService = {
+export class EmailService {
   async sendEmail({
     to,
     subject,
@@ -26,5 +26,5 @@ export const emailService = {
       subject,
       html: text,
     })
-  },
+  }
 }

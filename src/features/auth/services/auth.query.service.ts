@@ -1,10 +1,16 @@
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { MeViewModel } from '../types/output/MeViewModel.js'
-import { usersQueryRepository } from '../../users/repositories/users.query.repository.js'
+import { UsersQueryRepository } from '../../users/repositories/users.query.repository.js'
 
-export const authQueryService = {
+export class AuthQueryService {
+  usersQueryRepository: UsersQueryRepository
+
+  constructor(usersQueryRepository: UsersQueryRepository) {
+    this.usersQueryRepository = usersQueryRepository
+  }
+
   async me(userId: string): Promise<Result<MeViewModel>> {
-    const user = await usersQueryRepository.findById(userId)
+    const user = await this.usersQueryRepository.findById(userId)
 
     if (!user) {
       return {
@@ -24,5 +30,5 @@ export const authQueryService = {
       },
       extensions: [],
     }
-  },
+  }
 }

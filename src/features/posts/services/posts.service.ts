@@ -1,22 +1,35 @@
-import { postsRepository } from '../repositories/posts.repository.js'
 import { WithId } from 'mongodb'
 import { PostDB } from '../types/postDB.js'
 import { PostInputModel } from '../types/input/PostInputModel.js'
-import { blogsRepository } from '../../blogs/repositories/blogs.repository.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
+import { PostsRepository } from '../repositories/posts.repository.js'
+import { BlogsRepository } from '../../blogs/repositories/blogs.repository.js'
 
-export const postsService = {
+export class PostsService {
+  postsRepository: PostsRepository
+  blogsRepository: BlogsRepository
+
+  constructor(
+    postsRepository: PostsRepository,
+    blogsRepository: BlogsRepository
+  ) {
+    this.postsRepository = postsRepository
+    this.blogsRepository = blogsRepository
+  }
+
   async findMany(queryDto: PostQueryInput): Promise<{
     items: WithId<PostDB>[]
     totalCount: number
   }> {
-    return postsRepository.findMany(queryDto)
-  },
+    return this.postsRepository.findMany(queryDto)
+  }
+
   async findByIdOrFailed(id: string): Promise<WithId<PostDB>> {
-    return postsRepository.findByIdOrFail(id)
-  },
+    return this.postsRepository.findByIdOrFail(id)
+  }
+
   async createPost(dto: PostInputModel) {
-    const blog = await blogsRepository.findByIdOrFail(dto.blogId)
+    const blog = await this.blogsRepository.findByIdOrFail(dto.blogId)
 
     const post: PostDB = {
       ...dto,
@@ -24,13 +37,15 @@ export const postsService = {
       blogName: blog.name,
     }
 
-    return postsRepository.create(post)
-  },
+    return this.postsRepository.create(post)
+  }
+
   async deletePost(id: string) {
-    await postsRepository.delete(id)
-  },
+    await this.postsRepository.delete(id)
+  }
+
   async update(id: string, dto: PostInputModel): Promise<void> {
-    await blogsRepository.findByIdOrFail(dto.blogId) // если блога нет -> ошибка
-    await postsRepository.update(id, dto)
-  },
+    await this.blogsRepository.findByIdOrFail(dto.blogId) // если блога нет -> ошибка
+    await this.postsRepository.update(id, dto)
+  }
 }

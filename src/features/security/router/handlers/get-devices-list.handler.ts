@@ -2,9 +2,9 @@ import { Request } from 'express'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
-import { securityService } from '../../services/security.service.js'
 import { ApiResponse } from '../../../../core/types/utils-types.js'
 import { DeviceViewModel } from '../../types/output/DeviceViewModel.js'
+import { securityService } from '../../../../composition-root.js'
 
 export async function getDevicesListHandler(
   req: Request,

@@ -5,7 +5,7 @@ import { ObjectId, WithId } from 'mongodb'
 import { BlogDB } from '../types/blogDB.js'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 
-export const blogsRepository = {
+export class BlogsRepository {
   async findByIdOrFail(id: string): Promise<WithId<BlogDB>> {
     const res = await blogsCollection.findOne({ _id: new ObjectId(id) })
 
@@ -14,11 +14,13 @@ export const blogsRepository = {
     }
 
     return res
-  },
+  }
+
   async create(blog: BlogDB): Promise<string> {
     const insertResult = await blogsCollection.insertOne(blog)
     return insertResult.insertedId.toString()
-  },
+  }
+
   async delete(id: string): Promise<void> {
     const deleteResult = await blogsCollection.deleteOne({
       _id: new ObjectId(id),
@@ -29,7 +31,8 @@ export const blogsRepository = {
     }
 
     return
-  },
+  }
+
   async update(id: string, dto: BlogInputModel): Promise<void> {
     const updatedResult = await blogsCollection.updateOne(
       { _id: new ObjectId(id) },
@@ -41,5 +44,5 @@ export const blogsRepository = {
     }
 
     return
-  },
+  }
 }

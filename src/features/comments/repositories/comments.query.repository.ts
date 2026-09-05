@@ -5,11 +5,12 @@ import { CommentViewModel } from '../types/output/CommentViewModel.js'
 import { CommentQueryInput } from '../types/input/comment-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 
-export const commentsQueryRepository = {
+export class CommentsQueryRepository {
   async findById(id: string): Promise<CommentViewModel | null> {
     const comment = await commentsCollection.findOne({ _id: new ObjectId(id) })
     return comment ? this._mapToCommentViewModel(comment) : null
-  },
+  }
+
   async findCommentsByPostId(
     postId: string,
     queryDto: CommentQueryInput
@@ -36,7 +37,8 @@ export const commentsQueryRepository = {
       page: pageNumber,
       pagesCount: Math.ceil(totalCount / pageSize),
     }
-  },
+  }
+
   _mapToCommentViewModel(comment: WithId<CommentDB>): CommentViewModel {
     return {
       id: comment._id.toString(),
@@ -44,5 +46,5 @@ export const commentsQueryRepository = {
       commentatorInfo: comment.commentatorInfo,
       createdAt: comment.createdAt.toISOString(),
     }
-  },
+  }
 }

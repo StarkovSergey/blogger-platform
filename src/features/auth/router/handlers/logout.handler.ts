@@ -3,7 +3,7 @@ import { REFRESH_TOKEN_COOKIE_KEY } from '../../utils/constants.js'
 import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
-import { authService } from '../../services/auth.service.js'
+import { authService } from '../../../../composition-root.js'
 
 export async function logoutHandler(req: Request, res: Response) {
   try {

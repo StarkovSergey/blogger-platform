@@ -6,7 +6,7 @@ import { ResultStatus } from '../../../../common/result/result.js'
 import { resultStatusToHttpStatusCode } from '../../../../common/result/resultStatusToHttpStatusCode.js'
 import { HttpStatus } from '../../../../common/constants/constants.js'
 import { SETTINGS } from '../../../../settings/config.js'
-import { authService } from '../../services/auth.service.js'
+import { authService } from '../../../../composition-root.js'
 
 export const refreshTokenHandler = async (
   req: Request,

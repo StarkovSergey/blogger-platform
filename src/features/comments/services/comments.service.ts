@@ -1,11 +1,25 @@
 import { CommentInputModel } from '../types/input/CommentInputModel.js'
 import { CommentDB } from '../types/commentDB.js'
-import { usersRepository } from '../../users/repositories/users.repository.js'
 import { Result, ResultStatus } from '../../../common/result/result.js'
-import { commentsRepository } from '../repositories/comments.repository.js'
-import { postsRepository } from '../../posts/repositories/posts.repository.js'
+import { UsersRepository } from '../../users/repositories/users.repository.js'
+import { PostsRepository } from '../../posts/repositories/posts.repository.js'
+import { CommentsRepository } from '../repositories/comments.repository.js'
 
-export const commentsService = {
+export class CommentsService {
+  usersRepository: UsersRepository
+  postsRepository: PostsRepository
+  commentsRepository: CommentsRepository
+
+  constructor(
+    usersRepository: UsersRepository,
+    postsRepository: PostsRepository,
+    commentsRepository: CommentsRepository
+  ) {
+    this.usersRepository = usersRepository
+    this.postsRepository = postsRepository
+    this.commentsRepository = commentsRepository
+  }
+
   async create({
     userId,
     postId,
@@ -15,7 +29,7 @@ export const commentsService = {
     userId: string
     postId: string
   }): Promise<Result<string>> {
-    const user = await usersRepository.findById(userId)
+    const user = await this.usersRepository.findById(userId)
 
     if (!user) {
       return {
@@ -26,7 +40,7 @@ export const commentsService = {
       }
     }
 
-    const post = await postsRepository.findById(postId)
+    const post = await this.postsRepository.findById(postId)
 
     if (!post) {
       return {
@@ -47,14 +61,15 @@ export const commentsService = {
       },
     }
 
-    const commentId = await commentsRepository.create(comment)
+    const commentId = await this.commentsRepository.create(comment)
 
     return {
       status: ResultStatus.Success,
       data: commentId,
       extensions: [],
     }
-  },
+  }
+
   async update({
     id,
     userId,
@@ -70,7 +85,7 @@ export const commentsService = {
       return canModifyResult
     }
 
-    const isSuccessUpdate = await commentsRepository.update(id, dto)
+    const isSuccessUpdate = await this.commentsRepository.update(id, dto)
 
     if (!isSuccessUpdate) {
       return {
@@ -85,7 +100,8 @@ export const commentsService = {
       data: null,
       extensions: [],
     }
-  },
+  }
+
   async delete(id: string, userId: string): Promise<Result<null>> {
     const canModifyResult = await this._ensureUserCanModifyComment(id, userId)
 
@@ -93,7 +109,7 @@ export const commentsService = {
       return canModifyResult
     }
 
-    const isSuccessDelete = await commentsRepository.delete(id)
+    const isSuccessDelete = await this.commentsRepository.delete(id)
 
     if (!isSuccessDelete) {
       return {
@@ -109,13 +125,13 @@ export const commentsService = {
       data: null,
       extensions: [],
     }
-  },
+  }
 
   async _ensureUserCanModifyComment(
     id: string,
     userId: string
   ): Promise<Result<null>> {
-    const comment = await commentsRepository.findById(id)
+    const comment = await this.commentsRepository.findById(id)
 
     if (!comment) {
       return {
@@ -140,5 +156,5 @@ export const commentsService = {
       data: null,
       extensions: [],
     }
-  },
+  }
 }
