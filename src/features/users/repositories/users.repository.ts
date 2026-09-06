@@ -1,7 +1,11 @@
 import { usersCollection } from '../../../db/collections.js'
 import { ObjectId } from 'mongodb'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
-import { EmailConfirmation, User } from '../services/user.entity.js'
+import {
+  EmailConfirmation,
+  PasswordRecovery,
+  User,
+} from '../services/user.entity.js'
 
 export class UsersRepository {
   async create(user: User): Promise<string> {
@@ -81,6 +85,38 @@ export class UsersRepository {
     const result = await usersCollection.updateOne(
       { _id },
       { $set: { emailConfirmation } }
+    )
+
+    return result.modifiedCount === 1
+  }
+
+  async findByRecoveryCode(recoveryCode: string) {
+    return usersCollection.findOne({
+      'passwordRecovery.recoveryCode': recoveryCode,
+    })
+  }
+
+  async updatePasswordRecovery(
+    _id: ObjectId,
+    passwordRecovery: PasswordRecovery
+  ) {
+    const result = await usersCollection.updateOne(
+      { _id },
+      { $set: { passwordRecovery } }
+    )
+
+    return result.modifiedCount === 1
+  }
+
+  async updatePasswordHash(_id: ObjectId, passwordHash: string) {
+    const result = await usersCollection.updateOne(
+      { _id },
+      {
+        $set: {
+          passwordHash,
+          passwordRecovery: null,
+        },
+      }
     )
 
     return result.modifiedCount === 1

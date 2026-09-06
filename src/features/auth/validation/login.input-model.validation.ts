@@ -2,7 +2,7 @@ import { body } from 'express-validator'
 import { passwordValidation } from '../../users/validation/user.input-model.validation.js'
 
 export const createLoginInputModelValidation = () => [
-  passwordValidation,
+  passwordValidation(),
   body('loginOrEmail')
     .isString()
     .trim()

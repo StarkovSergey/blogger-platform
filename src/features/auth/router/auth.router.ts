@@ -8,12 +8,15 @@ import { registrationHandler } from './handlers/registration.js'
 import { confirmationCodeValidation } from '../validation/confirmation-code.validation.js'
 import { registrationConfirmationHandler } from './handlers/registration-confirmation.js'
 import { createUserInputModelValidationChain } from '../../users/validation/user.input-model.validation.js'
-import { createEmailResendingInputModelValidationChain } from '../validation/email-resending.input-model.validation.js'
+import { createEmailValidationChain } from '../validation/email-resending.input-model.validation.js'
 import { registrationEmailResendingHandler } from './handlers/registration-email-resending.js'
 import { refreshTokenGuard } from '../../../core/middleware/validation/refresh-token-guard.middleware.js'
 import { refreshTokenHandler } from './handlers/refresh-token.handler.js'
 import { logoutHandler } from './handlers/logout.handler.js'
 import { rateLimitMiddleware } from '../../../core/middleware/validation/rate-limit.middleware.js'
+import { passwordRecoveryHandler } from './handlers/password-recovery.handler.js'
+import { createNewPasswordValidationChain } from '../validation/new-password.validation.js'
+import { newPasswordHandler } from './handlers/new-password.handler.js'
 
 export const AUTH_ROUTER_PATHS = {
   ROOT: '',
@@ -24,6 +27,8 @@ export const AUTH_ROUTER_PATHS = {
   REGISTRATION_EMAIL_RESENDING: '/registration-email-resending',
   REFRESH_TOKEN: '/refresh-token',
   LOGOUT: '/logout',
+  PASSWORD_RECOVERY: '/password-recovery',
+  NEW_PASSWORD: '/new-password',
 } as const
 
 export const authRouter = Router()
@@ -57,7 +62,7 @@ authRouter.post(
 authRouter.post(
   AUTH_ROUTER_PATHS.REGISTRATION_EMAIL_RESENDING,
   rateLimitMiddleware,
-  createEmailResendingInputModelValidationChain(),
+  createEmailValidationChain(),
   inputValidationResultMiddleware,
   registrationEmailResendingHandler
 )
@@ -69,3 +74,19 @@ authRouter.post(
 )
 
 authRouter.post(AUTH_ROUTER_PATHS.LOGOUT, refreshTokenGuard, logoutHandler)
+
+authRouter.post(
+  AUTH_ROUTER_PATHS.PASSWORD_RECOVERY,
+  rateLimitMiddleware,
+  createEmailValidationChain(),
+  inputValidationResultMiddleware,
+  passwordRecoveryHandler
+)
+
+authRouter.post(
+  AUTH_ROUTER_PATHS.NEW_PASSWORD,
+  rateLimitMiddleware,
+  createNewPasswordValidationChain(),
+  inputValidationResultMiddleware,
+  newPasswordHandler
+)

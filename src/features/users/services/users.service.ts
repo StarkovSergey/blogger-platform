@@ -1,9 +1,9 @@
 import { UserInputModel } from '../types/input/UserInputModel.js'
-import { UserDB } from '../types/userDB.js'
 import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { UserErrorCode } from '../types/user-error-code.js'
 import { UsersRepository } from '../repositories/users.repository.js'
 import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
+import { User } from './user.entity.js'
 
 export class UsersService {
   usersRepository: UsersRepository
@@ -37,17 +37,7 @@ export class UsersService {
     }
 
     const hash = await this.passwordHashService.generateHash(userDto.password)
-    const newUser: UserDB = {
-      login: userDto.login,
-      email: userDto.email,
-      passwordHash: hash,
-      createdAt: new Date(),
-      emailConfirmation: {
-        isConfirmed: true, // т.к. создаём через админа
-        confirmationCode: '',
-        expirationDate: new Date(),
-      },
-    }
+    const newUser = new User(userDto.login, userDto.email, hash, true)
 
     return await this.usersRepository.create(newUser)
   }

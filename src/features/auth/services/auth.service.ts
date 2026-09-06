@@ -7,7 +7,11 @@ import {
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { LoginSuccessViewModel } from '../types/output/LoginSuccessViewModel.js'
 import { RegistrationInputModel } from '../types/input/registration-input-model.js'
-import { EmailConfirmation, User } from '../../users/services/user.entity.js'
+import {
+  EMAIL_CONFIRMATION_CODE_EXPIRATION_MS,
+  EmailConfirmation,
+  User,
+} from '../../users/services/user.entity.js'
 import { emailManager } from '../../../core/constants/managers/email-manager.js'
 import { randomUUID } from 'node:crypto'
 import { SessionDB } from '../types/sessionDB.js'
@@ -15,6 +19,9 @@ import { SessionsRepository } from '../repositories/sessions.repository.js'
 import { UsersRepository } from '../../users/repositories/users.repository.js'
 import { EmailService } from '../../../core/adapters/email.service.js'
 import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
+import { NewPasswordRecoveryInputModel } from '../types/input/new-password-recovery-input-model.js'
+
+const RECOVERY_PASSWORD_CODE_EXPIRATION_MS = 5 * 60 * 1000 // 5 минут
 
 export class AuthService {
   sessionsRepository: SessionsRepository
@@ -195,7 +202,9 @@ export class AuthService {
 
     const emailConfirmation: EmailConfirmation = {
       confirmationCode: randomUUID(),
-      expirationDate: new Date(Date.now() + 10 * 60 * 1000),
+      expirationDate: new Date(
+        Date.now() + EMAIL_CONFIRMATION_CODE_EXPIRATION_MS
+      ),
       isConfirmed: false,
     }
 
@@ -304,6 +313,98 @@ export class AuthService {
       extensions: [],
       errorMessage: 'Some error',
       data: null,
+    }
+  }
+
+  async passwordRecovery(email: string): Promise<Result> {
+    const user = await this.usersRepository.findByEmail(email)
+
+    if (!user) {
+      return {
+        status: ResultStatus.Success, // всё-равно 204; не светим, есть ли такой пользователь
+        data: null,
+        extensions: [],
+      }
+    }
+
+    const recoveryCode = randomUUID()
+
+    const isUpdated = await this.usersRepository.updatePasswordRecovery(
+      user._id,
+      {
+        recoveryCode,
+        expirationDate: new Date(
+          Date.now() + RECOVERY_PASSWORD_CODE_EXPIRATION_MS
+        ),
+      }
+    )
+
+    if (!isUpdated) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: 'Bad Request',
+        data: null,
+        extensions: [],
+      }
+    }
+
+    this.emailService
+      .sendEmail({
+        to: user.email,
+        subject: emailManager.passwordRecovery.subject,
+        text: emailManager.passwordRecovery.email(recoveryCode),
+      })
+      .catch((err) => {
+        // тут можно сделать либо retry, либо rollback
+        console.error('error in sending email:', err)
+      })
+
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
+    }
+  }
+
+  async updatePassword(dto: NewPasswordRecoveryInputModel): Promise<Result> {
+    const user = await this.usersRepository.findByRecoveryCode(dto.recoveryCode)
+
+    if (
+      !user ||
+      !user.passwordRecovery?.expirationDate ||
+      user.passwordRecovery?.expirationDate < new Date()
+    ) {
+      return {
+        status: ResultStatus.BadRequest,
+        data: null,
+        extensions: [
+          { field: 'recoveryCode', message: 'Incorrect recovery code' },
+        ],
+      }
+    }
+
+    const newPasswordHash = await this.passwordHashService.generateHash(
+      dto.newPassword
+    )
+
+    const isUpdated = await this.usersRepository.updatePasswordHash(
+      user._id,
+      newPasswordHash
+    )
+
+    if (!isUpdated) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: 'Bad Request',
+        data: null,
+        extensions: [],
+      }
+    }
+
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
     }
   }
 }

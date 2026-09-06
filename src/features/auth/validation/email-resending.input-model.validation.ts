@@ -1,7 +1,7 @@
 import { body } from 'express-validator'
 import { EMAIL_REGEXP } from '../../../common/constants/regexp.js'
 
-export const createEmailResendingInputModelValidationChain = () => [
+export const createEmailValidationChain = () => [
   body('email')
     .isString()
     .withMessage('email should be a string')
