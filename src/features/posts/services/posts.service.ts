@@ -4,14 +4,16 @@ import { PostInputModel } from '../types/input/PostInputModel.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 import { PostsRepository } from '../repositories/posts.repository.js'
 import { BlogsRepository } from '../../blogs/repositories/blogs.repository.js'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class PostsService {
-  postsRepository: PostsRepository
-  blogsRepository: BlogsRepository
+  private postsRepository: PostsRepository
+  private blogsRepository: BlogsRepository
 
   constructor(
-    postsRepository: PostsRepository,
-    blogsRepository: BlogsRepository
+    @inject(PostsRepository) postsRepository: PostsRepository,
+    @inject(BlogsRepository) blogsRepository: BlogsRepository
   ) {
     this.postsRepository = postsRepository
     this.blogsRepository = blogsRepository

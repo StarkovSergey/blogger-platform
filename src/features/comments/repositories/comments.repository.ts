@@ -2,7 +2,9 @@ import { commentsCollection } from '../../../db/collections.js'
 import { CommentDB } from '../types/commentDB.js'
 import { CommentInputModel } from '../types/input/CommentInputModel.js'
 import { ObjectId } from 'mongodb'
+import { injectable } from 'inversify'
 
+@injectable()
 export class CommentsRepository {
   async findById(id: string) {
     return commentsCollection.findOne({ _id: new ObjectId(id) })

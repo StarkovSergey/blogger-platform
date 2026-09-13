@@ -4,16 +4,18 @@ import { Result, ResultStatus } from '../../../common/result/result.js'
 import { UsersRepository } from '../../users/repositories/users.repository.js'
 import { PostsRepository } from '../../posts/repositories/posts.repository.js'
 import { CommentsRepository } from '../repositories/comments.repository.js'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class CommentsService {
-  usersRepository: UsersRepository
-  postsRepository: PostsRepository
-  commentsRepository: CommentsRepository
+  private usersRepository: UsersRepository
+  private postsRepository: PostsRepository
+  private commentsRepository: CommentsRepository
 
   constructor(
-    usersRepository: UsersRepository,
-    postsRepository: PostsRepository,
-    commentsRepository: CommentsRepository
+    @inject(UsersRepository) usersRepository: UsersRepository,
+    @inject(PostsRepository) postsRepository: PostsRepository,
+    @inject(CommentsRepository) commentsRepository: CommentsRepository
   ) {
     this.usersRepository = usersRepository
     this.postsRepository = postsRepository

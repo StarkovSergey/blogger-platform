@@ -1,6 +1,8 @@
 import { SessionDB } from '../types/sessionDB.js'
 import { sessionsCollection } from '../../../db/collections.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class SessionsRepository {
   async addSession(session: SessionDB) {
     const insertResult = await sessionsCollection.insertOne(session)

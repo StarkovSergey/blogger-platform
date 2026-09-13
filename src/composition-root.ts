@@ -1,3 +1,6 @@
+import 'reflect-metadata'
+import { Container } from 'inversify'
+
 import { SessionsRepository } from './features/auth/repositories/sessions.repository.js'
 import { SessionsQueryRepository } from './features/auth/repositories/sessions.query.repository.js'
 import { AuthService } from './features/auth/services/auth.service.js'
@@ -19,51 +22,63 @@ import { JwtService } from './core/adapters/jwt.service.js'
 import { PasswordHashService } from './core/adapters/password-hash.service.js'
 import { UsersService } from './features/users/services/users.service.js'
 
+export const container = new Container({
+  defaultScope: 'Singleton',
+})
+
+container.bind(SessionsRepository).toSelf()
+container.bind(SessionsQueryRepository).toSelf()
+
+container.bind(BlogsRepository).toSelf()
+container.bind(BlogsQueryRepository).toSelf()
+container.bind(PostsRepository).toSelf()
+container.bind(PostsQueryRepository).toSelf()
+container.bind(CommentsRepository).toSelf()
+container.bind(CommentsQueryRepository).toSelf()
+
+container.bind(UsersRepository).toSelf()
+container.bind(UsersQueryRepository).toSelf()
+container.bind(EmailService).toSelf()
+container.bind(JwtService).toSelf()
+container.bind(PasswordHashService).toSelf()
+container.bind(AuthService).toSelf()
+container.bind(AuthQueryService).toSelf()
+container.bind(UsersService).toSelf()
+
+container.bind(BlogsService).toSelf()
+container.bind(PostsService).toSelf()
+container.bind(CommentsService).toSelf()
+container.bind(SecurityService).toSelf()
+
 // repositories
-export const sessionsRepository = new SessionsRepository()
-export const sessionsQueryRepository = new SessionsQueryRepository()
+export const sessionsRepository = container.get(SessionsRepository)
+export const sessionsQueryRepository = container.get(SessionsQueryRepository)
 
-export const blogsRepository = new BlogsRepository()
-export const blogsQueryRepository = new BlogsQueryRepository()
+export const blogsRepository = container.get(BlogsRepository)
+export const blogsQueryRepository = container.get(BlogsQueryRepository)
 
-export const postsRepository = new PostsRepository()
-export const postsQueryRepository = new PostsQueryRepository()
+export const postsRepository = container.get(PostsRepository)
+export const postsQueryRepository = container.get(PostsQueryRepository)
 
-export const commentsQueryRepository = new CommentsQueryRepository()
-export const commentsRepository = new CommentsRepository()
+export const commentsQueryRepository = container.get(CommentsQueryRepository)
+export const commentsRepository = container.get(CommentsRepository)
 
-export const usersRepository = new UsersRepository()
-export const usersQueryRepository = new UsersQueryRepository()
+export const usersRepository = container.get(UsersRepository)
+export const usersQueryRepository = container.get(UsersQueryRepository)
 
 // helper services
-export const emailService = new EmailService()
-export const jwtService = new JwtService()
-export const passwordHashService = new PasswordHashService()
+export const emailService = container.get(EmailService)
+export const jwtService = container.get(JwtService)
+export const passwordHashService = container.get(PasswordHashService)
 
 // services
-export const authService = new AuthService(
-  sessionsRepository,
-  usersRepository,
-  emailService,
-  jwtService,
-  passwordHashService
-)
-export const authQueryService = new AuthQueryService(usersQueryRepository)
+export const authService = container.get(AuthService)
+export const authQueryService = container.get(AuthQueryService)
 
-export const usersService = new UsersService(
-  usersRepository,
-  passwordHashService
-)
+export const usersService = container.get(UsersService)
 
-export const blogsService = new BlogsService(blogsRepository, postsRepository)
-export const postsService = new PostsService(postsRepository, blogsRepository)
-export const commentsService = new CommentsService(
-  usersRepository,
-  postsRepository,
-  commentsRepository
-)
+export const blogsService = container.get(BlogsService)
+export const postsService = container.get(PostsService)
+export const commentsService = container.get(CommentsService)
 
-export const securityService = new SecurityService(
-  sessionsRepository,
-  sessionsQueryRepository
-)
+export const securityService = container.get(SecurityService)

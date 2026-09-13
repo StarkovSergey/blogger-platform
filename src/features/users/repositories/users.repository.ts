@@ -6,7 +6,9 @@ import {
   PasswordRecovery,
   User,
 } from '../services/user.entity.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class UsersRepository {
   async create(user: User): Promise<string> {
     const insertResult = await usersCollection.insertOne(user)

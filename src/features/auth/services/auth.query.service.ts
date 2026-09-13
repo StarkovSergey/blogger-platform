@@ -1,11 +1,16 @@
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { MeViewModel } from '../types/output/MeViewModel.js'
 import { UsersQueryRepository } from '../../users/repositories/users.query.repository.js'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class AuthQueryService {
-  usersQueryRepository: UsersQueryRepository
+  private usersQueryRepository: UsersQueryRepository
 
-  constructor(usersQueryRepository: UsersQueryRepository) {
+  constructor(
+    @inject(UsersQueryRepository)
+    usersQueryRepository: UsersQueryRepository
+  ) {
     this.usersQueryRepository = usersQueryRepository
   }
 

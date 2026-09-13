@@ -4,7 +4,9 @@ import { CommentDB } from '../types/commentDB.js'
 import { CommentViewModel } from '../types/output/CommentViewModel.js'
 import { CommentQueryInput } from '../types/input/comment-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class CommentsQueryRepository {
   async findById(id: string): Promise<CommentViewModel | null> {
     const comment = await commentsCollection.findOne({ _id: new ObjectId(id) })

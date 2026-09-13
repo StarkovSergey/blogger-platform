@@ -4,7 +4,9 @@ import { PostDB } from '../types/postDB.js'
 import { postsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class PostsRepository {
   async findMany(queryDto: PostQueryInput): Promise<{
     items: WithId<PostDB>[]

@@ -40,6 +40,4 @@ describe('Recovery password', () => {
       .send({ email: userDto.email })
       .expect(HttpStatus.NO_CONTENT_204)
   })
-
-  it('POST -> "auth/new-password": should return error if password is incorrect; status 400;', async () => {})
 })

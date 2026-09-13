@@ -4,14 +4,16 @@ import { UserErrorCode } from '../types/user-error-code.js'
 import { UsersRepository } from '../repositories/users.repository.js'
 import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
 import { User } from './user.entity.js'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class UsersService {
-  usersRepository: UsersRepository
-  passwordHashService: PasswordHashService
+  private usersRepository: UsersRepository
+  private passwordHashService: PasswordHashService
 
   constructor(
-    usersRepository: UsersRepository,
-    passwordHashService: PasswordHashService
+    @inject(UsersRepository) usersRepository: UsersRepository,
+    @inject(PasswordHashService) passwordHashService: PasswordHashService
   ) {
     this.usersRepository = usersRepository
     this.passwordHashService = passwordHashService

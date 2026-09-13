@@ -5,7 +5,9 @@ import { NotFoundException } from '../../../core/exceptions/not-found.exception.
 import { PostViewModel } from '../types/output/PostViewModel.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class PostsQueryRepository {
   async findMany(queryDto: PostQueryInput): Promise<Pagination<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto

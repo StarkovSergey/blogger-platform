@@ -20,22 +20,24 @@ import { UsersRepository } from '../../users/repositories/users.repository.js'
 import { EmailService } from '../../../core/adapters/email.service.js'
 import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
 import { NewPasswordRecoveryInputModel } from '../types/input/new-password-recovery-input-model.js'
+import { inject, injectable } from 'inversify'
 
 const RECOVERY_PASSWORD_CODE_EXPIRATION_MS = 5 * 60 * 1000 // 5 минут
 
+@injectable()
 export class AuthService {
-  sessionsRepository: SessionsRepository
-  usersRepository: UsersRepository
-  emailService: EmailService
-  jwtService: JwtService
-  passwordHashService: PasswordHashService
+  private sessionsRepository: SessionsRepository
+  private usersRepository: UsersRepository
+  private emailService: EmailService
+  private jwtService: JwtService
+  private passwordHashService: PasswordHashService
 
   constructor(
-    sessionsRepository: SessionsRepository,
-    usersRepository: UsersRepository,
-    emailService: EmailService,
-    jwtService: JwtService,
-    passwordHashService: PasswordHashService
+    @inject(SessionsRepository) sessionsRepository: SessionsRepository,
+    @inject(UsersRepository) usersRepository: UsersRepository,
+    @inject(EmailService) emailService: EmailService,
+    @inject(JwtService) jwtService: JwtService,
+    @inject(PasswordHashService) passwordHashService: PasswordHashService
   ) {
     this.sessionsRepository = sessionsRepository
     this.usersRepository = usersRepository

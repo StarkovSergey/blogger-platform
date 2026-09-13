@@ -6,7 +6,9 @@ import { blogsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { BlogViewModel } from '../types/output/BlogViewModel.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class BlogsQueryRepository {
   async findMany(queryDto: BlogQueryInput): Promise<Pagination<BlogViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =

@@ -4,7 +4,9 @@ import { ObjectId, WithId } from 'mongodb'
 
 import { BlogDB } from '../types/blogDB.js'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class BlogsRepository {
   async findByIdOrFail(id: string): Promise<WithId<BlogDB>> {
     const res = await blogsCollection.findOne({ _id: new ObjectId(id) })

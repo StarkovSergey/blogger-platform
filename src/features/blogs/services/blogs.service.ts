@@ -6,14 +6,16 @@ import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { PostDB } from '../../posts/types/postDB.js'
 import { BlogPostInputModel } from '../types/input/BlogPostInputModel.js'
 import { PostsRepository } from '../../posts/repositories/posts.repository.js'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class BlogsService {
-  blogsRepository: BlogsRepository
-  postsRepository: PostsRepository
+  private blogsRepository: BlogsRepository
+  private postsRepository: PostsRepository
 
   constructor(
-    blogsRepository: BlogsRepository,
-    postsRepository: PostsRepository
+    @inject(BlogsRepository) blogsRepository: BlogsRepository,
+    @inject(PostsRepository) postsRepository: PostsRepository
   ) {
     this.blogsRepository = blogsRepository
     this.postsRepository = postsRepository

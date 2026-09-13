@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer'
 import { SETTINGS } from '../../settings/config.js'
+import { injectable } from 'inversify'
 
+@injectable()
 export class EmailService {
   async sendEmail({
     to,

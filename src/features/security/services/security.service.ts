@@ -6,13 +6,16 @@ import { Result, ResultStatus } from '../../../common/result/result.js'
 import { DeviceViewModel } from '../types/output/DeviceViewModel.js'
 import { SessionsQueryRepository } from '../../auth/repositories/sessions.query.repository.js'
 import { SessionsRepository } from '../../auth/repositories/sessions.repository.js'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class SecurityService {
-  sessionsRepository: SessionsRepository
-  sessionsQueryRepository: SessionsQueryRepository
+  private sessionsRepository: SessionsRepository
+  private sessionsQueryRepository: SessionsQueryRepository
 
   constructor(
-    sessionsRepository: SessionsRepository,
+    @inject(SessionsRepository) sessionsRepository: SessionsRepository,
+    @inject(SessionsQueryRepository)
     sessionsQueryRepository: SessionsQueryRepository
   ) {
     this.sessionsRepository = sessionsRepository

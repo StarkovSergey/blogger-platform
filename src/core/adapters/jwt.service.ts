@@ -1,5 +1,6 @@
 import jwt, { SignOptions } from 'jsonwebtoken'
 import { SETTINGS } from '../../settings/config.js'
+import { injectable } from 'inversify'
 
 export type RefreshTokenPayload = {
   userId: string
@@ -10,6 +11,7 @@ export type RefreshTokenPayload = {
 
 export type AccessTokenPayload = Omit<RefreshTokenPayload, 'deviceId'>
 
+@injectable()
 export class JwtService {
   async createJWT(userId: string) {
     return jwt.sign({ userId }, SETTINGS.JWT_SECRET, {
