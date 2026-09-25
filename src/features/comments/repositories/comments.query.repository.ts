@@ -1,15 +1,14 @@
-import { commentsCollection } from '../../../db/collections.js'
-import { ObjectId, WithId } from 'mongodb'
-import { CommentDB } from '../types/commentDB.js'
+import { WithId } from 'mongodb'
 import { CommentViewModel } from '../types/output/CommentViewModel.js'
 import { CommentQueryInput } from '../types/input/comment-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 import { injectable } from 'inversify'
+import { CommentDB, commentModel } from '../domain/comment.schema.js'
 
 @injectable()
 export class CommentsQueryRepository {
   async findById(id: string): Promise<CommentViewModel | null> {
-    const comment = await commentsCollection.findOne({ _id: new ObjectId(id) })
+    const comment = await commentModel.findById(id).lean()
     return comment ? this._mapToCommentViewModel(comment) : null
   }
 
@@ -21,15 +20,15 @@ export class CommentsQueryRepository {
     const skip = (pageNumber - 1) * pageSize
 
     const [items, totalCount] = await Promise.all([
-      commentsCollection
+      commentModel
         .find({
           postId,
         })
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
-        .toArray(),
-      commentsCollection.countDocuments({ postId }),
+        .lean(),
+      commentModel.countDocuments({ postId }),
     ])
 
     return {

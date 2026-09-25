@@ -1,11 +1,10 @@
-import { ObjectId, WithId } from 'mongodb'
-import { PostDB } from '../types/postDB.js'
-import { postsCollection } from '../../../db/collections.js'
+import { WithId } from 'mongodb'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { PostViewModel } from '../types/output/PostViewModel.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 import { injectable } from 'inversify'
+import { PostDB, postModel } from '../domain/post.schema.js'
 
 @injectable()
 export class PostsQueryRepository {
@@ -15,13 +14,13 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize
 
     const [items, totalCount] = await Promise.all([
-      postsCollection
+      postModel
         .find()
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
-        .toArray(),
-      postsCollection.countDocuments(),
+        .lean(),
+      postModel.countDocuments(),
     ])
 
     return {
@@ -34,7 +33,7 @@ export class PostsQueryRepository {
   }
 
   async findByIdOrFailed(id: string): Promise<PostViewModel> {
-    const res = await postsCollection.findOne({ _id: new ObjectId(id) })
+    const res = await postModel.findById(id).lean()
 
     if (!res) {
       throw new NotFoundException('Post not found')
@@ -51,15 +50,15 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize
 
     const [items, totalCount] = await Promise.all([
-      postsCollection
+      postModel
         .find({
           blogId,
         })
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
-        .toArray(),
-      postsCollection.countDocuments({ blogId }),
+        .lean(),
+      postModel.countDocuments({ blogId }),
     ])
 
     return {

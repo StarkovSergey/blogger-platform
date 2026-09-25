@@ -2,11 +2,10 @@ import { Pagination } from '../../../core/types/paginated-output.js'
 import { UserViewModel } from '../types/output/UserViewModel.js'
 import { UserQueryInput } from '../types/input/user-query-input.js'
 import { escapeRegExp } from '../../../common/helpers/escape-reg-exp.js'
-import { usersCollection } from '../../../db/collections.js'
-import { ObjectId, WithId } from 'mongodb'
-import { UserDB } from '../types/userDB.js'
+import { WithId } from 'mongodb'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { injectable } from 'inversify'
+import { UserDB, userModel } from '../domain/user.schema.js'
 
 @injectable()
 export class UsersQueryRepository {
@@ -40,13 +39,13 @@ export class UsersQueryRepository {
     }
 
     const [items, totalCount] = await Promise.all([
-      usersCollection
+      userModel
         .find(filter)
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
-        .toArray(),
-      usersCollection.countDocuments(filter),
+        .lean(),
+      userModel.countDocuments(filter),
     ])
 
     return {
@@ -59,13 +58,13 @@ export class UsersQueryRepository {
   }
 
   async findById(id: string): Promise<UserViewModel | null> {
-    const user = await usersCollection.findOne({ _id: new ObjectId(id) })
+    const user = await userModel.findById(id)
 
     return user ? this._mapToUserListViewModel(user) : null
   }
 
   async findByIdOrFail(id: string): Promise<UserViewModel> {
-    const res = await usersCollection.findOne({ _id: new ObjectId(id) })
+    const res = await userModel.findById(id).lean()
 
     if (!res) {
       throw new NotFoundException('User not found')

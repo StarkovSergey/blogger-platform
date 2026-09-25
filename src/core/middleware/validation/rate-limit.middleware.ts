@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { rateLimitCollection } from '../../../db/collections.js'
 import { HttpStatus } from '../../../common/constants/constants.js'
 import {
   RATE_LIMIT_MAX_ATTEMPTS,
   RATE_LIMIT_WINDOW_SECONDS,
 } from '../../constants/constants.js'
+import { rateLimitModel } from '../../domain/rate-limit.schema.js'
 
 export const rateLimitMiddleware = async (
   req: Request,
@@ -16,7 +16,7 @@ export const rateLimitMiddleware = async (
 
   const tenSecondsAgo = new Date(Date.now() - RATE_LIMIT_WINDOW_SECONDS * 1000)
 
-  const attemptsCount = await rateLimitCollection.countDocuments({
+  const attemptsCount = await rateLimitModel.countDocuments({
     url,
     ip,
     date: {
@@ -28,7 +28,7 @@ export const rateLimitMiddleware = async (
     return res.sendStatus(HttpStatus.TOO_MANY_REQUESTS_429)
   }
 
-  await rateLimitCollection.insertOne({ date: new Date(), ip, url })
+  await rateLimitModel.create({ date: new Date(), ip, url })
 
   next()
 }

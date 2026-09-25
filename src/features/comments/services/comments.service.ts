@@ -1,10 +1,10 @@
 import { CommentInputModel } from '../types/input/CommentInputModel.js'
-import { CommentDB } from '../types/commentDB.js'
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { UsersRepository } from '../../users/repositories/users.repository.js'
 import { PostsRepository } from '../../posts/repositories/posts.repository.js'
 import { CommentsRepository } from '../repositories/comments.repository.js'
 import { inject, injectable } from 'inversify'
+import { CommentDB } from '../domain/comment.schema.js'
 
 @injectable()
 export class CommentsService {

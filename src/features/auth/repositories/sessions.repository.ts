@@ -1,33 +1,36 @@
-import { SessionDB } from '../types/sessionDB.js'
-import { sessionsCollection } from '../../../db/collections.js'
 import { injectable } from 'inversify'
+import { SessionDB, sessionModel } from '../domain/session.schema.js'
 
 @injectable()
 export class SessionsRepository {
   async addSession(session: SessionDB) {
-    const insertResult = await sessionsCollection.insertOne(session)
-    return Boolean(insertResult.insertedId)
+    const insertResult = await sessionModel.create(session)
+    return Boolean(insertResult._id)
   }
   async findSession(iat: Date, deviceId: string) {
-    return sessionsCollection.findOne({
-      iat,
-      deviceId,
-    })
+    return sessionModel
+      .findOne({
+        iat,
+        deviceId,
+      })
+      .lean()
   }
   async findSessionByDeviceId(deviceId: string) {
-    return sessionsCollection.findOne({
-      deviceId,
-    })
+    return sessionModel
+      .findOne({
+        deviceId,
+      })
+      .lean()
   }
   async findAllSessions() {
-    return sessionsCollection.find().toArray()
+    return sessionModel.find().lean()
   }
   async updateSession(
     deviceId: string,
     currentIat: Date,
     dto: { iat: Date; exp: Date; ip: string }
   ) {
-    const updateResult = await sessionsCollection.updateOne(
+    const updateResult = await sessionModel.updateOne(
       {
         iat: currentIat,
         deviceId,
@@ -44,7 +47,7 @@ export class SessionsRepository {
     return updateResult.matchedCount === 1
   }
   async deleteSession(deviceId: string, iat: Date) {
-    const result = await sessionsCollection.deleteOne({
+    const result = await sessionModel.deleteOne({
       deviceId,
       iat,
     })
@@ -52,7 +55,7 @@ export class SessionsRepository {
     return result.deletedCount > 0
   }
   async deleteAllOtherSessions(currentDeviceId: string, userId: string) {
-    const result = await sessionsCollection.deleteMany({
+    const result = await sessionModel.deleteMany({
       userId,
       deviceId: { $ne: currentDeviceId },
     })

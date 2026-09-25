@@ -1,12 +1,12 @@
 import { WithId } from 'mongodb'
-import { BlogDB, BlogErrorCode } from '../types/blogDB.js'
 import { BlogsRepository } from '../repositories/blogs.repository.js'
 import { BlogInputModel } from '../types/input/BlogInputModel.js'
 import { DomainException } from '../../../core/exceptions/domain.exception.js'
-import { PostDB } from '../../posts/types/postDB.js'
 import { BlogPostInputModel } from '../types/input/BlogPostInputModel.js'
 import { PostsRepository } from '../../posts/repositories/posts.repository.js'
 import { inject, injectable } from 'inversify'
+import { BlogDB, BlogErrorCode, blogModel } from '../domain/blog.schema.js'
+import { PostDB } from '../../posts/domain/post.schema.js'
 
 @injectable()
 export class BlogsService {
@@ -26,13 +26,13 @@ export class BlogsService {
   }
 
   async create(blog: BlogInputModel): Promise<string> {
-    const newBlog: BlogDB = {
-      ...blog,
-      isMembership: false,
-      createdAt: new Date(),
-    }
+    const newBlog = new blogModel()
+    newBlog.name = blog.name
+    newBlog.description = blog.description
+    newBlog.websiteUrl = blog.websiteUrl
 
-    return await this.blogsRepository.create(newBlog)
+    const res = await this.blogsRepository.save(newBlog)
+    return res._id.toString()
   }
 
   async createBlogPost(

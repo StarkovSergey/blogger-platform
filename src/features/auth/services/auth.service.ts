@@ -14,13 +14,13 @@ import {
 } from '../../users/services/user.entity.js'
 import { emailManager } from '../../../core/constants/managers/email-manager.js'
 import { randomUUID } from 'node:crypto'
-import { SessionDB } from '../types/sessionDB.js'
 import { SessionsRepository } from '../repositories/sessions.repository.js'
 import { UsersRepository } from '../../users/repositories/users.repository.js'
 import { EmailService } from '../../../core/adapters/email.service.js'
 import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
 import { NewPasswordRecoveryInputModel } from '../types/input/new-password-recovery-input-model.js'
 import { inject, injectable } from 'inversify'
+import { SessionDB } from '../domain/session.schema.js'
 
 const RECOVERY_PASSWORD_CODE_EXPIRATION_MS = 5 * 60 * 1000 // 5 минут
 

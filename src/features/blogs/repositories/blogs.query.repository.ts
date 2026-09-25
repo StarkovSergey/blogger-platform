@@ -1,12 +1,11 @@
 import { BlogQueryInput } from '../types/input/blog-query-input.js'
-import { ObjectId, WithId } from 'mongodb'
-import { BlogDB } from '../types/blogDB.js'
+import { WithId } from 'mongodb'
 import { escapeRegExp } from '../../../common/helpers/escape-reg-exp.js'
-import { blogsCollection } from '../../../db/collections.js'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { BlogViewModel } from '../types/output/BlogViewModel.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 import { injectable } from 'inversify'
+import { BlogDB, blogModel } from '../domain/blog.schema.js'
 
 @injectable()
 export class BlogsQueryRepository {
@@ -22,13 +21,13 @@ export class BlogsQueryRepository {
     }
 
     const [items, totalCount] = await Promise.all([
-      blogsCollection
+      blogModel
         .find(filter)
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
-        .toArray(),
-      blogsCollection.countDocuments(filter),
+        .lean(),
+      blogModel.countDocuments(filter),
     ])
 
     return {
@@ -41,11 +40,11 @@ export class BlogsQueryRepository {
   }
 
   async findById(id: string): Promise<WithId<BlogDB> | null> {
-    return blogsCollection.findOne({ _id: new ObjectId(id) })
+    return blogModel.findById(id).lean()
   }
 
   async findByIdOrFail(id: string): Promise<BlogViewModel> {
-    const res = await blogsCollection.findOne({ _id: new ObjectId(id) })
+    const res = await blogModel.findById(id).lean()
 
     if (!res) {
       throw new NotFoundException('Blog not found')

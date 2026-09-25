@@ -1,15 +1,14 @@
-import { sessionsCollection } from '../../../db/collections.js'
 import { WithId } from 'mongodb'
-import { SessionDB } from '../types/sessionDB.js'
 import { DeviceViewModel } from '../../security/types/output/DeviceViewModel.js'
 import { injectable } from 'inversify'
+import { SessionDB, sessionModel } from '../domain/session.schema.js'
 
 @injectable()
 export class SessionsQueryRepository {
   async findManyByUserId(userId: string): Promise<DeviceViewModel[]> {
-    const sessions = await sessionsCollection
+    const sessions = await sessionModel
       .find({ userId, exp: { $gt: new Date() } })
-      .toArray()
+      .lean()
 
     return sessions.map(this._mapToDeviceViewModel)
   }

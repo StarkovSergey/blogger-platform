@@ -1,38 +1,16 @@
 import { PostInputModel } from '../types/input/PostInputModel.js'
-import { ObjectId, WithId } from 'mongodb'
-import { PostDB } from '../types/postDB.js'
-import { postsCollection } from '../../../db/collections.js'
+import { WithId } from 'mongodb'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
-import { PostQueryInput } from '../types/input/post-query-input.js'
 import { injectable } from 'inversify'
+import { PostDB, postModel } from '../domain/post.schema.js'
 
 @injectable()
 export class PostsRepository {
-  async findMany(queryDto: PostQueryInput): Promise<{
-    items: WithId<PostDB>[]
-    totalCount: number
-  }> {
-    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto
-
-    const skip = (pageNumber - 1) * pageSize
-
-    const [items, totalCount] = await Promise.all([
-      postsCollection
-        .find()
-        .sort({ [sortBy]: sortDirection })
-        .skip(skip)
-        .limit(pageSize)
-        .toArray(),
-      postsCollection.countDocuments(),
-    ])
-
-    return { items, totalCount }
-  }
   async findById(id: string): Promise<WithId<PostDB> | null> {
-    return postsCollection.findOne({ _id: new ObjectId(id) })
+    return postModel.findById(id).lean()
   }
   async findByIdOrFail(id: string): Promise<WithId<PostDB>> {
-    const res = await postsCollection.findOne({ _id: new ObjectId(id) })
+    const res = await postModel.findById(id).lean()
 
     if (!res) {
       throw new NotFoundException('Post not found')
@@ -41,36 +19,29 @@ export class PostsRepository {
     return res
   }
   async create(post: PostDB): Promise<string> {
-    const insertResult = await postsCollection.insertOne({
-      ...post,
-    })
+    const res = await postModel.create(post)
 
-    return insertResult.insertedId.toString()
+    return res._id.toString()
   }
   async delete(id: string): Promise<void> {
-    const deleteResult = await postsCollection.deleteOne({
-      _id: new ObjectId(id),
-    })
+    const deleteResult = await postModel.findByIdAndDelete(id)
 
-    if (deleteResult.deletedCount < 1) {
+    if (!deleteResult) {
       throw new NotFoundException('Post not found')
     }
 
     return
   }
   async update(id: string, dto: PostInputModel): Promise<void> {
-    const updatedResult = await postsCollection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: dto }
-    )
+    const updatedResult = await postModel.findByIdAndUpdate(id, dto)
 
-    if (updatedResult.matchedCount < 1) {
+    if (!updatedResult) {
       throw new NotFoundException('Post not found')
     }
 
     return
   }
   async countByBlogId(blogId: string): Promise<number> {
-    return postsCollection.countDocuments({ blogId })
+    return postModel.countDocuments({ blogId })
   }
 }

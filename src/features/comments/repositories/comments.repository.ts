@@ -1,37 +1,27 @@
-import { commentsCollection } from '../../../db/collections.js'
-import { CommentDB } from '../types/commentDB.js'
 import { CommentInputModel } from '../types/input/CommentInputModel.js'
-import { ObjectId } from 'mongodb'
 import { injectable } from 'inversify'
+import { CommentDB, commentModel } from '../domain/comment.schema.js'
 
 @injectable()
 export class CommentsRepository {
   async findById(id: string) {
-    return commentsCollection.findOne({ _id: new ObjectId(id) })
+    return commentModel.findById(id).lean()
   }
 
   async create(comment: CommentDB): Promise<string> {
-    const insertResult = await commentsCollection.insertOne(comment)
+    const result = await commentModel.create(comment)
 
-    return insertResult.insertedId.toString()
+    return result._id.toString()
   }
 
   async update(id: string, dto: CommentInputModel): Promise<boolean> {
-    const updatedResult = await commentsCollection.updateOne(
-      {
-        _id: new ObjectId(id),
-      },
-      { $set: dto }
-    )
+    const updatedResult = await commentModel.findByIdAndUpdate(id, dto)
 
-    return updatedResult.matchedCount > 0
+    return Boolean(updatedResult)
   }
 
   async delete(id: string): Promise<boolean> {
-    const deleteResult = await commentsCollection.deleteOne({
-      _id: new ObjectId(id),
-    })
-
-    return deleteResult.deletedCount > 0
+    const deleteResult = await commentModel.findByIdAndDelete(id)
+    return Boolean(deleteResult)
   }
 }

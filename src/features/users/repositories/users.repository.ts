@@ -1,26 +1,20 @@
-import { usersCollection } from '../../../db/collections.js'
 import { ObjectId } from 'mongodb'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
-import {
-  EmailConfirmation,
-  PasswordRecovery,
-  User,
-} from '../services/user.entity.js'
+import { EmailConfirmation, PasswordRecovery } from '../services/user.entity.js'
 import { injectable } from 'inversify'
+import { UserDB, userModel } from '../domain/user.schema.js'
 
 @injectable()
 export class UsersRepository {
-  async create(user: User): Promise<string> {
-    const insertResult = await usersCollection.insertOne(user)
-    return insertResult.insertedId.toString()
+  async create(user: UserDB): Promise<string> {
+    const res = await userModel.create(user)
+    return res._id.toString()
   }
 
   async delete(id: string) {
-    const deleteResult = await usersCollection.deleteOne({
-      _id: new ObjectId(id),
-    })
+    const deleteResult = await userModel.findByIdAndDelete(id)
 
-    if (deleteResult.deletedCount < 1) {
+    if (!deleteResult) {
       throw new NotFoundException('User not found')
     }
 
@@ -28,42 +22,37 @@ export class UsersRepository {
   }
 
   async findById(id: string) {
-    return usersCollection.findOne({
-      _id: new ObjectId(id),
-    })
+    return userModel.findById(id).lean()
   }
   async findByLogin(login: string) {
-    return usersCollection.findOne({
-      login,
-    })
+    return userModel
+      .findOne({
+        login,
+      })
+      .lean()
   }
 
   async findByEmail(email: string) {
-    return usersCollection.findOne({
-      email,
-    })
+    return userModel
+      .findOne({
+        email,
+      })
+      .lean()
   }
 
   async findByLoginOrEmail(loginOrEmail: string) {
-    return usersCollection.findOne({
-      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
-    })
+    return userModel
+      .findOne({
+        $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+      })
+      .lean()
   }
 
-  async doesExistByLoginOrEmail(
-    login: string,
-    email: string
-  ): Promise<boolean> {
-    const user = await usersCollection.findOne({
-      $or: [{ email }, { login }],
-    })
-
-    return Boolean(user)
-  }
-
-  async updateConfirmation(_id: ObjectId) {
-    const result = await usersCollection.updateOne(
-      { _id },
+  async updateConfirmation(id: ObjectId) {
+    const result = await userModel.updateOne(
+      {
+        _id: id,
+      },
       {
         $set: {
           'emailConfirmation.isConfirmed': true,
@@ -75,16 +64,16 @@ export class UsersRepository {
   }
 
   async findUserByConfirmationCode(code: string) {
-    return usersCollection.findOne({
-      'emailConfirmation.confirmationCode': code,
-    })
+    return userModel
+      .findOne({ 'emailConfirmation.confirmationCode': code })
+      .lean()
   }
 
   async updateEmailConfirmation(
     _id: ObjectId,
     emailConfirmation: EmailConfirmation
   ) {
-    const result = await usersCollection.updateOne(
+    const result = await userModel.updateOne(
       { _id },
       { $set: { emailConfirmation } }
     )
@@ -93,16 +82,18 @@ export class UsersRepository {
   }
 
   async findByRecoveryCode(recoveryCode: string) {
-    return usersCollection.findOne({
-      'passwordRecovery.recoveryCode': recoveryCode,
-    })
+    return userModel
+      .findOne({
+        'passwordRecovery.recoveryCode': recoveryCode,
+      })
+      .lean()
   }
 
   async updatePasswordRecovery(
     _id: ObjectId,
     passwordRecovery: PasswordRecovery
   ) {
-    const result = await usersCollection.updateOne(
+    const result = await userModel.updateOne(
       { _id },
       { $set: { passwordRecovery } }
     )
@@ -111,7 +102,7 @@ export class UsersRepository {
   }
 
   async updatePasswordHash(_id: ObjectId, passwordHash: string) {
-    const result = await usersCollection.updateOne(
+    const result = await userModel.updateOne(
       { _id },
       {
         $set: {

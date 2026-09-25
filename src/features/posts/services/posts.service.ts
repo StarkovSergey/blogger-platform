@@ -1,10 +1,9 @@
 import { WithId } from 'mongodb'
-import { PostDB } from '../types/postDB.js'
 import { PostInputModel } from '../types/input/PostInputModel.js'
-import { PostQueryInput } from '../types/input/post-query-input.js'
 import { PostsRepository } from '../repositories/posts.repository.js'
 import { BlogsRepository } from '../../blogs/repositories/blogs.repository.js'
 import { inject, injectable } from 'inversify'
+import { PostDB } from '../domain/post.schema.js'
 
 @injectable()
 export class PostsService {
@@ -17,13 +16,6 @@ export class PostsService {
   ) {
     this.postsRepository = postsRepository
     this.blogsRepository = blogsRepository
-  }
-
-  async findMany(queryDto: PostQueryInput): Promise<{
-    items: WithId<PostDB>[]
-    totalCount: number
-  }> {
-    return this.postsRepository.findMany(queryDto)
   }
 
   async findByIdOrFailed(id: string): Promise<WithId<PostDB>> {

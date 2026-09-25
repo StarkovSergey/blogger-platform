@@ -1,16 +1,18 @@
 import type { BlogInputModel } from '../types/input/BlogInputModel.js'
-import { blogsCollection } from '../../../db/collections.js'
-import { ObjectId, WithId } from 'mongodb'
+import { WithId } from 'mongodb'
 
-import { BlogDB } from '../types/blogDB.js'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { injectable } from 'inversify'
+import { BlogDB, BlogDocument, blogModel } from '../domain/blog.schema.js'
 
 @injectable()
 export class BlogsRepository {
-  async findByIdOrFail(id: string): Promise<WithId<BlogDB>> {
-    const res = await blogsCollection.findOne({ _id: new ObjectId(id) })
+  async save(blog: BlogDocument) {
+    return await blog.save()
+  }
 
+  async findByIdOrFail(id: string): Promise<WithId<BlogDB>> {
+    const res = await blogModel.findById(id).lean()
     if (!res) {
       throw new NotFoundException('Blog not found')
     }
@@ -19,16 +21,14 @@ export class BlogsRepository {
   }
 
   async create(blog: BlogDB): Promise<string> {
-    const insertResult = await blogsCollection.insertOne(blog)
-    return insertResult.insertedId.toString()
+    const res = await blogModel.create(blog)
+    return res._id.toString()
   }
 
   async delete(id: string): Promise<void> {
-    const deleteResult = await blogsCollection.deleteOne({
-      _id: new ObjectId(id),
-    })
+    const deleteResult = await blogModel.findByIdAndDelete(id)
 
-    if (deleteResult.deletedCount < 1) {
+    if (!deleteResult) {
       throw new NotFoundException('Blog not found')
     }
 
@@ -36,12 +36,9 @@ export class BlogsRepository {
   }
 
   async update(id: string, dto: BlogInputModel): Promise<void> {
-    const updatedResult = await blogsCollection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: dto }
-    )
+    const updatedResult = await blogModel.findByIdAndUpdate(id, dto)
 
-    if (updatedResult.matchedCount < 1) {
+    if (!updatedResult) {
       throw new NotFoundException('Blog not found')
     }
 

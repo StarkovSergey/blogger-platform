@@ -1,28 +1,27 @@
-import { MongoClient, Db } from 'mongodb'
 import { SETTINGS } from '../settings/config.js'
-import { initCollections } from './collections.js'
-
-export let client: MongoClient
+import mongoose from 'mongoose'
 
 export async function runDB(url: string) {
-  client = new MongoClient(url)
-
   try {
-    await client.connect()
-    const db: Db = client.db(SETTINGS.DB_NAME)
+    await mongoose.connect(url, {
+      dbName: SETTINGS.DB_NAME,
+    })
 
-    await initCollections(db)
+    const db = mongoose.connection.db
+
+    if (!db) {
+      throw new Error('Mongoose connected, but db is undefined')
+    }
+
     console.log('✅ Connected to the database')
   } catch (e) {
-    await client.close()
+    await mongoose.disconnect()
+
     throw new Error(`❌ Database not connected: ${e}`)
   }
 }
 
 // для тестов
 export async function stopDb() {
-  if (!client) {
-    throw new Error('❌ No active client')
-  }
-  await client.close()
+  await mongoose.connection.close()
 }
