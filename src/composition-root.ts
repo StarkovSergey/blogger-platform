@@ -21,6 +21,7 @@ import { EmailService } from './core/adapters/email.service.js'
 import { JwtService } from './core/adapters/jwt.service.js'
 import { PasswordHashService } from './core/adapters/password-hash.service.js'
 import { UsersService } from './features/users/services/users.service.js'
+import { CommentsLikeRepository } from './features/comments/repositories/comments-like.repository.js'
 
 export const container = new Container({
   defaultScope: 'Singleton',
@@ -35,9 +36,10 @@ container.bind(PostsRepository).toSelf()
 container.bind(PostsQueryRepository).toSelf()
 container.bind(CommentsRepository).toSelf()
 container.bind(CommentsQueryRepository).toSelf()
-
 container.bind(UsersRepository).toSelf()
 container.bind(UsersQueryRepository).toSelf()
+container.bind(CommentsLikeRepository).toSelf()
+
 container.bind(EmailService).toSelf()
 container.bind(JwtService).toSelf()
 container.bind(PasswordHashService).toSelf()

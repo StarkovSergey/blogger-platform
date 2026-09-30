@@ -12,7 +12,8 @@ export async function getCommentHandler(
 ) {
   try {
     const id = req.params.id
-    const comment = await commentsQueryRepository.findById(id)
+    const userId = req.user?.id
+    const comment = await commentsQueryRepository.findById(id, userId)
 
     if (!comment) {
       res.sendStatus(HttpStatus.NOT_FOUND_404)

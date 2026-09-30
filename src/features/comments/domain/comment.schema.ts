@@ -1,9 +1,25 @@
-import mongoose, { InferSchemaType, Model } from 'mongoose'
+import mongoose, { HydratedDocument, InferSchemaType, Model } from 'mongoose'
 
 const commentatorInfoSchema = new mongoose.Schema(
   {
     userId: { type: String, required: true },
     userLogin: { type: String, required: true },
+  },
+  { _id: false }
+)
+
+const likesInfoSchema = new mongoose.Schema(
+  {
+    likesCount: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
+    dislikesCount: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
   },
   { _id: false }
 )
@@ -29,6 +45,10 @@ export const commentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    likesInfo: {
+      type: likesInfoSchema,
+      required: true,
+    },
   },
   {
     collection: 'comments',
@@ -36,6 +56,7 @@ export const commentSchema = new mongoose.Schema(
 )
 
 export type CommentDB = InferSchemaType<typeof commentSchema>
+export type CommentDocument = HydratedDocument<CommentDB>
 export const commentModel: Model<CommentDB> = mongoose.model(
   'Comment',
   commentSchema

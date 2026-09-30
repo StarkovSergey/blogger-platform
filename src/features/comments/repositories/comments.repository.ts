@@ -1,11 +1,19 @@
 import { CommentInputModel } from '../types/input/CommentInputModel.js'
 import { injectable } from 'inversify'
-import { CommentDB, commentModel } from '../domain/comment.schema.js'
+import {
+  CommentDB,
+  CommentDocument,
+  commentModel,
+} from '../domain/comment.schema.js'
 
 @injectable()
 export class CommentsRepository {
+  async save(comment: CommentDocument) {
+    return comment.save()
+  }
+
   async findById(id: string) {
-    return commentModel.findById(id).lean()
+    return commentModel.findById(id)
   }
 
   async create(comment: CommentDB): Promise<string> {

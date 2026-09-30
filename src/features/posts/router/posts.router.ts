@@ -17,6 +17,7 @@ import { getPostCommentsHandler } from './handlers/get-post-comments.handler.js'
 import { accessTokenGuard } from '../../../core/middleware/validation/access-token-guard.middleware.js'
 import { createCommentInputModelValidationChain } from '../../comments/validation/comment.input-model.validation.js'
 import { createCommentHandler } from './handlers/create-comment.handler.js'
+import { optionalAccessTokenGuard } from '../../../core/middleware/validation/optional-access-token-guard.middleware.js'
 
 export const POSTS_PATHS = {
   ROOT: '',
@@ -44,6 +45,7 @@ postsRouter.get(
 postsRouter.get(
   POSTS_PATHS.COMMENTS,
   paramsIdValidationMiddleware,
+  optionalAccessTokenGuard,
   paginationAndSortingValidation(CommentSortField),
   inputValidationResultMiddleware,
   sanitizeQueryMiddleware,

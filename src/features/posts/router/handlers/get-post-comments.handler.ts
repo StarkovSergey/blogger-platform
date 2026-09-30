@@ -20,12 +20,14 @@ export const getPostCommentsHandler = async (
   try {
     const queryInput = req.query
     const postId = req.params.id
+    const userId = req.user?.id
 
     await postsQueryRepository.findByIdOrFailed(postId) // если поста нет → 404
 
     const paginatedOutput = await commentsQueryRepository.findCommentsByPostId(
       postId,
-      queryInput
+      queryInput,
+      userId
     )
 
     res.json(paginatedOutput)
