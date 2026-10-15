@@ -4,7 +4,7 @@ import { PostViewModel } from '../types/output/PostViewModel.js'
 import { PostQueryInput } from '../types/input/post-query-input.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 import { injectable } from 'inversify'
-import { PostDB, postModel } from '../domain/post.schema.js'
+import { PostDB, PostModel } from '../domain/post.schema.js'
 
 @injectable()
 export class PostsQueryRepository {
@@ -14,13 +14,12 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize
 
     const [items, totalCount] = await Promise.all([
-      postModel
-        .find()
+      PostModel.find()
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
         .lean(),
-      postModel.countDocuments(),
+      PostModel.countDocuments(),
     ])
 
     return {
@@ -33,7 +32,7 @@ export class PostsQueryRepository {
   }
 
   async findByIdOrFailed(id: string): Promise<PostViewModel> {
-    const res = await postModel.findById(id).lean()
+    const res = await PostModel.findById(id).lean()
 
     if (!res) {
       throw new NotFoundException('Post not found')
@@ -50,15 +49,14 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize
 
     const [items, totalCount] = await Promise.all([
-      postModel
-        .find({
-          blogId,
-        })
+      PostModel.find({
+        blogId,
+      })
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
         .lean(),
-      postModel.countDocuments({ blogId }),
+      PostModel.countDocuments({ blogId }),
     ])
 
     return {

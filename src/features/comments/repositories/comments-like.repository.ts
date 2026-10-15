@@ -1,8 +1,7 @@
 import { injectable } from 'inversify'
 import {
-  CommentLikeDB,
   CommentLikeDocument,
-  commentLikeModel,
+  CommentLikeModel,
 } from '../domain/comment-like.schema.js'
 
 @injectable()
@@ -10,17 +9,15 @@ export class CommentsLikeRepository {
   async save(commentLike: CommentLikeDocument) {
     return commentLike.save()
   }
-  async findByUserIdAndCommentId(userId: string, commentId: string) {
-    return commentLikeModel.findOne({ userId, commentId })
-  }
 
-  async create(commentLike: CommentLikeDB) {
-    const result = await commentLikeModel.create(commentLike)
-
-    return result._id.toString()
+  async findByUserIdAndCommentId(
+    userId: string,
+    commentId: string
+  ): Promise<CommentLikeDocument | null> {
+    return CommentLikeModel.findOne({ userId, commentId })
   }
 
   async delete(id: string) {
-    return commentLikeModel.findByIdAndDelete(id)
+    return CommentLikeModel.findByIdAndDelete(id)
   }
 }

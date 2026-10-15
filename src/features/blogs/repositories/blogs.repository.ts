@@ -1,9 +1,6 @@
-import type { BlogInputModel } from '../types/input/BlogInputModel.js'
-import { WithId } from 'mongodb'
-
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { injectable } from 'inversify'
-import { BlogDB, BlogDocument, blogModel } from '../domain/blog.schema.js'
+import { BlogDocument, BlogModel } from '../domain/blog.schema.js'
 
 @injectable()
 export class BlogsRepository {
@@ -11,8 +8,8 @@ export class BlogsRepository {
     return await blog.save()
   }
 
-  async findByIdOrFail(id: string): Promise<WithId<BlogDB>> {
-    const res = await blogModel.findById(id).lean()
+  async findByIdOrFail(id: string): Promise<BlogDocument> {
+    const res = await BlogModel.findById(id)
     if (!res) {
       throw new NotFoundException('Blog not found')
     }
@@ -20,25 +17,10 @@ export class BlogsRepository {
     return res
   }
 
-  async create(blog: BlogDB): Promise<string> {
-    const res = await blogModel.create(blog)
-    return res._id.toString()
-  }
-
   async delete(id: string): Promise<void> {
-    const deleteResult = await blogModel.findByIdAndDelete(id)
+    const deleteResult = await BlogModel.findByIdAndDelete(id)
 
     if (!deleteResult) {
-      throw new NotFoundException('Blog not found')
-    }
-
-    return
-  }
-
-  async update(id: string, dto: BlogInputModel): Promise<void> {
-    const updatedResult = await blogModel.findByIdAndUpdate(id, dto)
-
-    if (!updatedResult) {
       throw new NotFoundException('Blog not found')
     }
 

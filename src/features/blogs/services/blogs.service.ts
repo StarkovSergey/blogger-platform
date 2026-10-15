@@ -5,7 +5,7 @@ import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { BlogPostInputModel } from '../types/input/BlogPostInputModel.js'
 import { PostsRepository } from '../../posts/repositories/posts.repository.js'
 import { inject, injectable } from 'inversify'
-import { BlogDB, BlogErrorCode, blogModel } from '../domain/blog.schema.js'
+import { BlogDB, BlogErrorCode, BlogModel } from '../domain/blog.schema.js'
 import { PostDB } from '../../posts/domain/post.schema.js'
 
 @injectable()
@@ -25,13 +25,10 @@ export class BlogsService {
     return this.blogsRepository.findByIdOrFail(id)
   }
 
-  async create(blog: BlogInputModel): Promise<string> {
-    const newBlog = new blogModel()
-    newBlog.name = blog.name
-    newBlog.description = blog.description
-    newBlog.websiteUrl = blog.websiteUrl
+  async create(dto: BlogInputModel): Promise<string> {
+    const blog = BlogModel.createBlog(dto)
 
-    const res = await this.blogsRepository.save(newBlog)
+    const res = await this.blogsRepository.save(blog)
     return res._id.toString()
   }
 
@@ -51,7 +48,10 @@ export class BlogsService {
   }
 
   async update(id: string, dto: BlogInputModel): Promise<void> {
-    await this.blogsRepository.update(id, dto)
+    const blog = await this.blogsRepository.findByIdOrFail(id)
+    blog.update(dto)
+
+    await this.blogsRepository.save(blog)
     return
   }
 

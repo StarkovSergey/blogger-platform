@@ -1,16 +1,18 @@
 import { PostInputModel } from '../types/input/PostInputModel.js'
-import { WithId } from 'mongodb'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { injectable } from 'inversify'
-import { PostDB, postModel } from '../domain/post.schema.js'
+import { PostDB, PostDocument, PostModel } from '../domain/post.schema.js'
 
 @injectable()
 export class PostsRepository {
-  async findById(id: string): Promise<WithId<PostDB> | null> {
-    return postModel.findById(id).lean()
+  async save(post: PostDocument) {
+    return post.save()
   }
-  async findByIdOrFail(id: string): Promise<WithId<PostDB>> {
-    const res = await postModel.findById(id).lean()
+  async findById(id: string): Promise<PostDocument | null> {
+    return PostModel.findById(id)
+  }
+  async findByIdOrFail(id: string): Promise<PostDocument> {
+    const res = await PostModel.findById(id)
 
     if (!res) {
       throw new NotFoundException('Post not found')
@@ -19,12 +21,12 @@ export class PostsRepository {
     return res
   }
   async create(post: PostDB): Promise<string> {
-    const res = await postModel.create(post)
+    const res = await PostModel.create(post)
 
     return res._id.toString()
   }
   async delete(id: string): Promise<void> {
-    const deleteResult = await postModel.findByIdAndDelete(id)
+    const deleteResult = await PostModel.findByIdAndDelete(id)
 
     if (!deleteResult) {
       throw new NotFoundException('Post not found')
@@ -33,7 +35,7 @@ export class PostsRepository {
     return
   }
   async update(id: string, dto: PostInputModel): Promise<void> {
-    const updatedResult = await postModel.findByIdAndUpdate(id, dto)
+    const updatedResult = await PostModel.findByIdAndUpdate(id, dto)
 
     if (!updatedResult) {
       throw new NotFoundException('Post not found')
@@ -42,6 +44,6 @@ export class PostsRepository {
     return
   }
   async countByBlogId(blogId: string): Promise<number> {
-    return postModel.countDocuments({ blogId })
+    return PostModel.countDocuments({ blogId })
   }
 }

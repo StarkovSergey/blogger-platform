@@ -5,7 +5,7 @@ import { NotFoundException } from '../../../core/exceptions/not-found.exception.
 import { BlogViewModel } from '../types/output/BlogViewModel.js'
 import { Pagination } from '../../../core/types/paginated-output.js'
 import { injectable } from 'inversify'
-import { BlogDB, blogModel } from '../domain/blog.schema.js'
+import { BlogDB, BlogModel } from '../domain/blog.schema.js'
 
 @injectable()
 export class BlogsQueryRepository {
@@ -21,13 +21,12 @@ export class BlogsQueryRepository {
     }
 
     const [items, totalCount] = await Promise.all([
-      blogModel
-        .find(filter)
+      BlogModel.find(filter)
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
         .lean(),
-      blogModel.countDocuments(filter),
+      BlogModel.countDocuments(filter),
     ])
 
     return {
@@ -40,11 +39,11 @@ export class BlogsQueryRepository {
   }
 
   async findById(id: string): Promise<WithId<BlogDB> | null> {
-    return blogModel.findById(id).lean()
+    return BlogModel.findById(id).lean()
   }
 
   async findByIdOrFail(id: string): Promise<BlogViewModel> {
-    const res = await blogModel.findById(id).lean()
+    const res = await BlogModel.findById(id).lean()
 
     if (!res) {
       throw new NotFoundException('Blog not found')

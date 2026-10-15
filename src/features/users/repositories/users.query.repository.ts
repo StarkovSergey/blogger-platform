@@ -5,7 +5,7 @@ import { escapeRegExp } from '../../../common/helpers/escape-reg-exp.js'
 import { WithId } from 'mongodb'
 import { NotFoundException } from '../../../core/exceptions/not-found.exception.js'
 import { injectable } from 'inversify'
-import { UserDB, userModel } from '../domain/user.schema.js'
+import { UserDB, UserModel } from '../domain/user.schema.js'
 
 @injectable()
 export class UsersQueryRepository {
@@ -39,13 +39,12 @@ export class UsersQueryRepository {
     }
 
     const [items, totalCount] = await Promise.all([
-      userModel
-        .find(filter)
+      UserModel.find(filter)
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(pageSize)
         .lean(),
-      userModel.countDocuments(filter),
+      UserModel.countDocuments(filter),
     ])
 
     return {
@@ -58,13 +57,13 @@ export class UsersQueryRepository {
   }
 
   async findById(id: string): Promise<UserViewModel | null> {
-    const user = await userModel.findById(id)
+    const user = await UserModel.findById(id)
 
     return user ? this._mapToUserListViewModel(user) : null
   }
 
   async findByIdOrFail(id: string): Promise<UserViewModel> {
-    const res = await userModel.findById(id).lean()
+    const res = await UserModel.findById(id).lean()
 
     if (!res) {
       throw new NotFoundException('User not found')

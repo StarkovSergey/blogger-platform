@@ -22,9 +22,43 @@ export const commentLikeSchema = new mongoose.Schema(
   }
 )
 
+class CommentLikeEntity {
+  status!: ReactionStatus
+  userId!: string
+  commentId!: string
+
+  static createLike(dto: {
+    status: ReactionStatus
+    userId: string
+    commentId: string
+  }): CommentLikeDocument {
+    return new CommentLikeModel({
+      status: dto.status,
+      userId: dto.userId,
+      commentId: dto.commentId,
+    })
+  }
+
+  changeStatus(status: ReactionStatus) {
+    this.status = status
+  }
+}
+
+interface CommentLikeMethods {
+  changeStatus(status: ReactionStatus): void
+}
+
 export type CommentLikeDB = InferSchemaType<typeof commentLikeSchema>
-export type CommentLikeDocument = HydratedDocument<CommentLikeDB>
-export const commentLikeModel: Model<CommentLikeDB> = mongoose.model(
-  'CommentLike',
-  commentLikeSchema
-)
+export type CommentLikeDocument = HydratedDocument<
+  CommentLikeDB,
+  CommentLikeMethods
+>
+export type CommentLikeModelType = Model<CommentLikeDB, {}, CommentLikeMethods> &
+  typeof CommentLikeEntity
+
+commentLikeSchema.loadClass(CommentLikeEntity)
+
+export const CommentLikeModel = mongoose.model<
+  CommentLikeDB,
+  CommentLikeModelType
+>('CommentLike', commentLikeSchema)

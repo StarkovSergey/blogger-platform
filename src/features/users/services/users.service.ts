@@ -3,8 +3,8 @@ import { DomainException } from '../../../core/exceptions/domain.exception.js'
 import { UserErrorCode } from '../types/user-error-code.js'
 import { UsersRepository } from '../repositories/users.repository.js'
 import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
-import { User } from './user.entity.js'
 import { inject, injectable } from 'inversify'
+import { UserModel } from '../domain/user.schema.js'
 
 @injectable()
 export class UsersService {
@@ -39,9 +39,14 @@ export class UsersService {
     }
 
     const hash = await this.passwordHashService.generateHash(userDto.password)
-    const newUser = new User(userDto.login, userDto.email, hash, true)
-
-    return await this.usersRepository.create(newUser)
+    const newUser = UserModel.createUser({
+      login: userDto.login,
+      email: userDto.email,
+      passwordHash: hash,
+      isConfirmed: true,
+    })
+    const res = await this.usersRepository.save(newUser)
+    return res._id.toString()
   }
 
   async delete(id: string) {

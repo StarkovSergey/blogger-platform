@@ -4,10 +4,11 @@ import { UsersRepository } from '../../users/repositories/users.repository.js'
 import { PostsRepository } from '../../posts/repositories/posts.repository.js'
 import { CommentsRepository } from '../repositories/comments.repository.js'
 import { inject, injectable } from 'inversify'
-import { CommentDB } from '../domain/comment.schema.js'
+import { CommentModel } from '../domain/comment.schema.js'
 import { LikeInputModel } from '../types/input/LikeInputModel.js'
 import { CommentsLikeRepository } from '../repositories/comments-like.repository.js'
 import { ReactionStatus } from '../constants/enums.js'
+import { CommentLikeModel } from '../domain/comment-like.schema.js'
 
 @injectable()
 export class CommentsService {
@@ -60,25 +61,18 @@ export class CommentsService {
       }
     }
 
-    const comment: CommentDB = {
-      postId,
+    const comment = CommentModel.createComment({
       content: dto.content,
-      createdAt: new Date(),
-      commentatorInfo: {
-        userId,
-        userLogin: user.login,
-      },
-      likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-      },
-    }
+      postId,
+      userId,
+      userLogin: user.login,
+    })
 
-    const commentId = await this.commentsRepository.create(comment)
+    const saved = await this.commentsRepository.save(comment)
 
     return {
       status: ResultStatus.Success,
-      data: commentId,
+      data: saved._id.toString(),
       extensions: [],
     }
   }
@@ -92,15 +86,9 @@ export class CommentsService {
     userId: string
     dto: CommentInputModel
   }): Promise<Result<null>> {
-    const canModifyResult = await this._ensureUserCanModifyComment(id, userId)
+    const comment = await this.commentsRepository.findById(id)
 
-    if (canModifyResult.status !== ResultStatus.Success) {
-      return canModifyResult
-    }
-
-    const isSuccessUpdate = await this.commentsRepository.update(id, dto)
-
-    if (!isSuccessUpdate) {
+    if (!comment) {
       return {
         status: ResultStatus.NotFound,
         errorMessage: 'Comment not found',
@@ -108,6 +96,19 @@ export class CommentsService {
         data: null,
       }
     }
+
+    if (!comment.belongsToUser(userId)) {
+      return {
+        status: ResultStatus.Forbidden,
+        errorMessage: 'Forbidden',
+        extensions: [],
+        data: null,
+      }
+    }
+
+    comment.updateContent(dto.content)
+    await this.commentsRepository.save(comment)
+
     return {
       status: ResultStatus.Success,
       data: null,
@@ -116,10 +117,24 @@ export class CommentsService {
   }
 
   async delete(id: string, userId: string): Promise<Result<null>> {
-    const canModifyResult = await this._ensureUserCanModifyComment(id, userId)
+    const comment = await this.commentsRepository.findById(id)
 
-    if (canModifyResult.status !== ResultStatus.Success) {
-      return canModifyResult
+    if (!comment) {
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: 'Comment not found',
+        extensions: [],
+        data: null,
+      }
+    }
+
+    if (!comment.belongsToUser(userId)) {
+      return {
+        status: ResultStatus.Forbidden,
+        errorMessage: 'Forbidden',
+        extensions: [],
+        data: null,
+      }
     }
 
     const isSuccessDelete = await this.commentsRepository.delete(id)
@@ -152,16 +167,12 @@ export class CommentsService {
       }
     }
 
-    /**
-     * Нужно обновить commentsLike collection и comment likeInfo
-     * */
     const existingCommentLike =
       await this.commentsLikeRepository.findByUserIdAndCommentId(userId, id)
 
     const prev = existingCommentLike?.status ?? ReactionStatus.None
     const next = dto.likeStatus
 
-    // тот же статус — ничего не делаем
     if (prev === next) {
       return {
         status: ResultStatus.Success,
@@ -170,68 +181,21 @@ export class CommentsService {
       }
     }
 
-    // 1) откатить предыдущую реакцию
-    if (prev === ReactionStatus.Like && next !== ReactionStatus.Like) {
-      comment.likesInfo.likesCount--
-    }
+    comment.applyLikeChange(prev, next)
 
-    if (prev === ReactionStatus.Dislike && next !== ReactionStatus.Dislike) {
-      comment.likesInfo.dislikesCount--
-    }
-
-    // 2) применить новую
-    if (next === ReactionStatus.Like) {
-      comment.likesInfo.likesCount++
-    }
-
-    if (next === ReactionStatus.Dislike) {
-      comment.likesInfo.dislikesCount++
-    }
-
-    // 3) синхронизировать коллекцию реакций
     if (!existingCommentLike) {
-      await this.commentsLikeRepository.create({
+      const commentLike = CommentLikeModel.createLike({
         status: next,
         commentId: id,
         userId,
       })
+      await this.commentsLikeRepository.save(commentLike)
     } else {
-      existingCommentLike.status = next
+      existingCommentLike.changeStatus(next)
       await this.commentsLikeRepository.save(existingCommentLike)
     }
-    // 4) сохранить счётчики на комментарии
+
     await this.commentsRepository.save(comment)
-
-    return {
-      status: ResultStatus.Success,
-      data: null,
-      extensions: [],
-    }
-  }
-
-  async _ensureUserCanModifyComment(
-    id: string,
-    userId: string
-  ): Promise<Result<null>> {
-    const comment = await this.commentsRepository.findById(id)
-
-    if (!comment) {
-      return {
-        status: ResultStatus.NotFound,
-        errorMessage: 'Comment not found',
-        extensions: [],
-        data: null,
-      }
-    }
-
-    if (userId !== comment.commentatorInfo.userId) {
-      return {
-        status: ResultStatus.Forbidden,
-        errorMessage: 'Forbidden',
-        extensions: [],
-        data: null,
-      }
-    }
 
     return {
       status: ResultStatus.Success,

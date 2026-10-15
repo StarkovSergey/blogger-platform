@@ -7,22 +7,15 @@ import {
 import { Result, ResultStatus } from '../../../common/result/result.js'
 import { LoginSuccessViewModel } from '../types/output/LoginSuccessViewModel.js'
 import { RegistrationInputModel } from '../types/input/registration-input-model.js'
-import {
-  EMAIL_CONFIRMATION_CODE_EXPIRATION_MS,
-  EmailConfirmation,
-  User,
-} from '../../users/services/user.entity.js'
 import { emailManager } from '../../../core/constants/managers/email-manager.js'
-import { randomUUID } from 'node:crypto'
 import { SessionsRepository } from '../repositories/sessions.repository.js'
 import { UsersRepository } from '../../users/repositories/users.repository.js'
 import { EmailService } from '../../../core/adapters/email.service.js'
 import { PasswordHashService } from '../../../core/adapters/password-hash.service.js'
 import { NewPasswordRecoveryInputModel } from '../types/input/new-password-recovery-input-model.js'
 import { inject, injectable } from 'inversify'
-import { SessionDB } from '../domain/session.schema.js'
-
-const RECOVERY_PASSWORD_CODE_EXPIRATION_MS = 5 * 60 * 1000 // 5 минут
+import { SessionDB, SessionModel } from '../domain/session.schema.js'
+import { UserModel } from '../../users/domain/user.schema.js'
 
 @injectable()
 export class AuthService {
@@ -74,7 +67,12 @@ export class AuthService {
     }
 
     const passwordHash = await this.passwordHashService.generateHash(password)
-    const newUser = new User(login, email, passwordHash)
+    const newUser = UserModel.createUser({
+      login,
+      email,
+      passwordHash,
+      isConfirmed: false,
+    })
 
     await this.usersRepository.create(newUser)
 
@@ -132,16 +130,15 @@ export class AuthService {
 
     const refreshTokenPayload = this.jwtService.decodeToken(refreshToken)
 
-    const session: SessionDB = {
+    const session = SessionModel.createSession({
       userId,
-      exp: jwtSecondsToDate(refreshTokenPayload.exp),
-      iat: jwtSecondsToDate(refreshTokenPayload.iat),
       deviceId,
       deviceName: meta.deviceName,
       ip: meta.ip,
-    }
-
-    await this.sessionsRepository.addSession(session)
+      iat: jwtSecondsToDate(refreshTokenPayload.iat),
+      exp: jwtSecondsToDate(refreshTokenPayload.exp),
+    })
+    await this.sessionsRepository.save(session)
 
     return {
       status: ResultStatus.Success,
@@ -153,12 +150,7 @@ export class AuthService {
   async confirmEmail(code: string): Promise<Result> {
     const user = await this.usersRepository.findUserByConfirmationCode(code)
 
-    const isInvalidCode =
-      !user ||
-      user.emailConfirmation.isConfirmed ||
-      user.emailConfirmation.expirationDate < new Date()
-
-    if (isInvalidCode) {
+    if (!user) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: 'Bad Request',
@@ -167,16 +159,18 @@ export class AuthService {
       }
     }
 
-    const isUpdated = await this.usersRepository.updateConfirmation(user._id)
+    const ok = user.updateConfirmation(code)
 
-    if (!isUpdated) {
+    if (!ok) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: 'Bad Request',
+        extensions: [{ field: 'code', message: 'Incorrect confirmation code' }],
         data: null,
-        extensions: [],
       }
     }
+
+    await this.usersRepository.save(user)
 
     return {
       status: ResultStatus.Success,
@@ -191,7 +185,7 @@ export class AuthService {
     // 3. Отправить новый email
     const user = await this.usersRepository.findByEmail(email)
 
-    if (!user || user.emailConfirmation.isConfirmed) {
+    if (!user) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: 'Bad Request',
@@ -202,20 +196,9 @@ export class AuthService {
       }
     }
 
-    const emailConfirmation: EmailConfirmation = {
-      confirmationCode: randomUUID(),
-      expirationDate: new Date(
-        Date.now() + EMAIL_CONFIRMATION_CODE_EXPIRATION_MS
-      ),
-      isConfirmed: false,
-    }
+    const ok = user.resendEmailConfirmation()
 
-    const isUpdated = await this.usersRepository.updateEmailConfirmation(
-      user._id,
-      emailConfirmation
-    )
-
-    if (!isUpdated) {
+    if (!ok) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: 'Bad Request',
@@ -225,13 +208,15 @@ export class AuthService {
         ],
       }
     }
+
+    await this.usersRepository.save(user)
 
     this.emailService
       .sendEmail({
         to: user.email,
         subject: emailManager.registration.subject,
         text: emailManager.registration.email(
-          emailConfirmation.confirmationCode
+          user.emailConfirmation.confirmationCode
         ),
       })
       .catch((err) => {
@@ -259,6 +244,20 @@ export class AuthService {
     refreshTokenPayload: RefreshTokenPayload,
     ip: string
   ): Promise<Result<{ accessToken: string; newRefreshToken: string }>> {
+    const session = await this.sessionsRepository.findSession(
+      jwtSecondsToDate(refreshTokenPayload.iat),
+      refreshTokenPayload.deviceId
+    )
+
+    if (!session) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: '',
+        data: null,
+        extensions: [],
+      }
+    }
+
     const accessToken = await this.jwtService.createJWT(
       refreshTokenPayload.userId
     )
@@ -270,24 +269,12 @@ export class AuthService {
     const newPayload = this.jwtService.decodeToken(newRefreshToken)
 
     // update session
-    const isUpdated = await this.sessionsRepository.updateSession(
-      refreshTokenPayload.deviceId,
-      jwtSecondsToDate(refreshTokenPayload.iat),
-      {
-        iat: jwtSecondsToDate(newPayload.iat),
-        exp: jwtSecondsToDate(newPayload.exp),
-        ip,
-      }
-    )
-
-    if (!isUpdated) {
-      return {
-        status: ResultStatus.Unauthorized,
-        errorMessage: '',
-        data: null,
-        extensions: [],
-      }
-    }
+    session.updateOnRefresh({
+      iat: jwtSecondsToDate(newPayload.iat),
+      exp: jwtSecondsToDate(newPayload.exp),
+      ip,
+    })
+    await this.sessionsRepository.save(session)
 
     return {
       status: ResultStatus.Success,
@@ -329,26 +316,8 @@ export class AuthService {
       }
     }
 
-    const recoveryCode = randomUUID()
-
-    const isUpdated = await this.usersRepository.updatePasswordRecovery(
-      user._id,
-      {
-        recoveryCode,
-        expirationDate: new Date(
-          Date.now() + RECOVERY_PASSWORD_CODE_EXPIRATION_MS
-        ),
-      }
-    )
-
-    if (!isUpdated) {
-      return {
-        status: ResultStatus.BadRequest,
-        errorMessage: 'Bad Request',
-        data: null,
-        extensions: [],
-      }
-    }
+    const recoveryCode = user.requestPasswordRecovery()
+    await this.usersRepository.save(user)
 
     this.emailService
       .sendEmail({
@@ -371,11 +340,7 @@ export class AuthService {
   async updatePassword(dto: NewPasswordRecoveryInputModel): Promise<Result> {
     const user = await this.usersRepository.findByRecoveryCode(dto.recoveryCode)
 
-    if (
-      !user ||
-      !user.passwordRecovery?.expirationDate ||
-      user.passwordRecovery?.expirationDate < new Date()
-    ) {
+    if (!user) {
       return {
         status: ResultStatus.BadRequest,
         data: null,
@@ -389,12 +354,9 @@ export class AuthService {
       dto.newPassword
     )
 
-    const isUpdated = await this.usersRepository.updatePasswordHash(
-      user._id,
-      newPasswordHash
-    )
+    const ok = user.updatePassword(dto.recoveryCode, newPasswordHash)
 
-    if (!isUpdated) {
+    if (!ok) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: 'Bad Request',
@@ -402,6 +364,8 @@ export class AuthService {
         extensions: [],
       }
     }
+
+    await this.usersRepository.save(user)
 
     return {
       status: ResultStatus.Success,

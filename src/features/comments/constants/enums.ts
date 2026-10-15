@@ -1,5 +1,5 @@
 export enum ReactionStatus {
-  None = 'none',
-  Like = 'like',
-  Dislike = 'dislike',
+  None = 'None',
+  Like = 'Like',
+  Dislike = 'Dislike',
 }

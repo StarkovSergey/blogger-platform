@@ -3,7 +3,7 @@ import { PostInputModel } from '../types/input/PostInputModel.js'
 import { PostsRepository } from '../repositories/posts.repository.js'
 import { BlogsRepository } from '../../blogs/repositories/blogs.repository.js'
 import { inject, injectable } from 'inversify'
-import { PostDB } from '../domain/post.schema.js'
+import { PostDB, PostModel } from '../domain/post.schema.js'
 
 @injectable()
 export class PostsService {
@@ -25,13 +25,15 @@ export class PostsService {
   async createPost(dto: PostInputModel) {
     const blog = await this.blogsRepository.findByIdOrFail(dto.blogId)
 
-    const post: PostDB = {
-      ...dto,
-      createdAt: new Date(),
+    const post = PostModel.createPost({
+      title: dto.title,
+      shortDescription: dto.shortDescription,
+      content: dto.content,
+      blogId: dto.blogId,
       blogName: blog.name,
-    }
-
-    return this.postsRepository.create(post)
+    })
+    const saved = await this.postsRepository.save(post)
+    return saved._id.toString()
   }
 
   async deletePost(id: string) {
@@ -40,6 +42,9 @@ export class PostsService {
 
   async update(id: string, dto: PostInputModel): Promise<void> {
     await this.blogsRepository.findByIdOrFail(dto.blogId) // если блога нет -> ошибка
-    await this.postsRepository.update(id, dto)
+
+    const post = await this.postsRepository.findByIdOrFail(id)
+    post.update(dto)
+    await this.postsRepository.save(post)
   }
 }
